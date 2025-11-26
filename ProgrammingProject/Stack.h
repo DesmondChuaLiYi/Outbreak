@@ -37,10 +37,22 @@ public:
 		if (isEmpty()) {
 			throw std::underflow_error("Stack underflow: cannot pop from an empty stack.");
 		}
-		// For a stack, we need to pop from the end
-		// Since DoublyLinkedList is limited, we'll just decrease size concept
-		// This is a basic implementation - a better Stack should inherit from SinglyLinkedList
-		throw std::runtime_error("Stack pop not fully implemented with DoublyLinkedList");
+		// Get the last element using iterator
+		auto it = fElements.begin();
+		T value;
+		int currentIndex = 0;
+		int lastIndex = size() - 1;
+		
+		// Iterate to the last element
+		while (currentIndex < lastIndex) {
+			++it;
+			++currentIndex;
+		}
+		value = *it;
+		
+		// Remove the last element
+		fElements.popBack();
+		return value;
 	}
 };
 

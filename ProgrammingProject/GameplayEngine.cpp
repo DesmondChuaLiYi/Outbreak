@@ -810,6 +810,7 @@ CombatResult GameplayEngine::conductCombat() {
 						std::cout << "  Zombie attacks for " << zombieAttackDmg << " damage!\n";
 						currentPlayer->takeDamage(zombieAttackDmg);
 						result.playerDamageTaken += zombieAttackDmg;
+						combatActionHistory.push("Took " + std::to_string(zombieAttackDmg) + " dmg from " + currentZombie->getType());
 					}
 				}
 			}
