@@ -1,0 +1,4 @@
+Vergil|1|10|100|100|3
+Bandage~1~Basic medical supplies.~3~1~1~1~15~0~0~0~0~0~0
+Bread~2~Nutritious bread to restore hunger.~2~1~1~1~0~20~0~0~0~0~0
+Cloth~3~Useful crafting material.~5~1~0~0~0~0~0~0~0~0~0

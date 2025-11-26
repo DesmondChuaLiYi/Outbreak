@@ -1,0 +1,21 @@
+Tony Redgrave
+
+4
+59
+162
+230
+loc_pump_station
+1
+7
+14
+14
+Hunting Rifle
+230
+6
+11
+|Canned Food|2|Restores 30 hunger|3|2|1|1|0|30|0|0
+|Axe|0|Heavy axe. 25 melee damage|1|4|0|1|0|0|0|25
+|Hunting Rifle|0|Powerful rifle. 40 damage|1|5|0|1|0|0|0|40
+0
+1
+26

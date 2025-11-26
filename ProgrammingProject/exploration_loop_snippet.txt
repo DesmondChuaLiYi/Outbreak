@@ -1,0 +1,115 @@
+// Add this to the end of GameEngine.cpp before the closing brace
+
+// ============================================================================
+// EXPLORATION LOOP
+// ============================================================================
+
+void GameEngine::runExplorationLoop(Player* player) {
+	GameplayEngine* gameplay = GameplayEngine::getInstance();
+	bool exploring = true;
+
+	while (exploring && player->getHealth() > 0) {
+		gameplay->displayCurrentLocation();
+
+		std::cout << "Command: ";
+		std::string command;
+		std::getline(std::cin, command);
+
+		// Convert to lowercase
+		for (char& c : command) c = tolower(c);
+
+		if (command.find("go ") == 0) {
+			std::string dir = command.substr(3);
+			size_t start = dir.find_first_not_of(" \t");
+			if (start != std::string::npos) {
+				dir = dir.substr(start);
+			}
+
+			Direction direction = gameplay->stringToDirection(dir);
+			if (direction != Direction::CENTER) {
+				gameplay->moveInDirection(direction);
+			}
+			else {
+				system("cls");
+				std::cout << "\n  Invalid direction.\n  Press ENTER...";
+				std::cin.get();
+			}
+		}
+		else if (command == "status") {
+			gameplay->displayPlayerStatus();
+		}
+		else if (command == "inventory") {
+			gameplay->displayInventory();
+		}
+		else if (command == "clues") {
+			gameplay->displayCollectedClues();
+		}
+		else if (command == "travel") {
+			if (gameplay->canTravelToNewLocation()) {
+				gameplay->displayTravelOptions();
+				
+				int choice;
+				std::cin >> choice;
+				std::cin.ignore();
+
+				if (choice > 0) {
+					// Get connection at index
+					SinglyLinkedList<std::string>& connections = gameplay->getCurrentLocation()->getConnections();
+					int count = 1;
+					for (auto it = connections.begin(); it != connections.end(); ++it) {
+						if (count == choice) {
+							gameplay->travelToLocation(*it);
+							break;
+						}
+						count++;
+					}
+				}
+			}
+			else {
+				system("cls");
+				std::cout << "\n  You haven't explored enough yet.\n";
+				std::cout << "  Explore more (15 steps needed).\n  Press ENTER...";
+				std::cin.get();
+			}
+		}
+		else if (command == "rest") {
+			system("cls");
+			std::cout << "\n  You rest...\n";
+			int heal = 25;
+			int newHP = player->getHealth() + heal;
+			if (newHP > player->getMaxHealth()) {
+				newHP = player->getMaxHealth();
+			}
+			player->setHealth(newHP);
+			std::cout << "  Restored " << heal << " HP!\n";
+			std::cout << "  HP: " << player->getHealth() << "/" << player->getMaxHealth() << "\n";
+			std::cout << "\n  Press ENTER...";
+			std::cin.get();
+		}
+		else if (command == "back") {
+			exploring = false;
+		}
+		else {
+			system("cls");
+			std::cout << "\n  Unknown command.\n";
+			std::cout << "  Available: go [dir], status, inventory, clues, rest";
+			if (gameplay->canTravelToNewLocation()) {
+				std::cout << ", travel";
+			}
+			std::cout << ", back\n";
+			std::cout << "  Press ENTER...";
+			std::cin.get();
+		}
+
+		if (player->getHealth() <= 0) {
+			system("cls");
+			std::cout << "\n\n" << std::string(80, '=') << "\n";
+			std::cout << "  GAME OVER\n";
+			std::cout << std::string(80, '=') << "\n\n";
+			std::cout << "  You succumbed to the outbreak...\n\n";
+			std::cout << "  Press ENTER...";
+			std::cin.get();
+			break;
+		}
+	}
+}

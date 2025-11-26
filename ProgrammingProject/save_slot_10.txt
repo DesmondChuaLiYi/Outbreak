@@ -1,0 +1,24 @@
+Tony Redgrave
+
+1
+8
+125
+125
+loc_industrial
+1
+1
+0
+0
+Knife
+0
+2
+14
+|Bandage|1|Restores 15 HP|2|3|1|1|15|0|0|0
+|Canned Food|2|Restores 30 hunger|2|4|1|1|0|30|0|0
+|Bandage|1|Restores 15 HP|2|3|1|1|15|0|0|0
+|Canned Food|2|Restores 30 hunger|3|4|1|1|0|30|0|0
+2
+loot_001
+loot_002
+1
+2
