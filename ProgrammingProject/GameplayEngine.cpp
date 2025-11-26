@@ -681,26 +681,7 @@ CombatResult GameplayEngine::conductCombat() {
 		system(CLEAR_SCREEN);
 		std::cout << "\n  COMBAT\n\n";
 
-		// Display combat history
-		if (!combatActionHistory.isEmpty()) {
-			std::cout << "  RECENT ACTIONS:\n";
-			Stack<std::string> tempStack;
 
-			// Copy to temp (reverses order)
-			while (!combatActionHistory.isEmpty()) {
-				tempStack.push(combatActionHistory.pop());
-			}
-
-			// Display and restore
-			int count = 1;
-			while (!tempStack.isEmpty() && count <= MAX_COMBAT_HISTORY) {
-				std::string action = tempStack.pop();
-				std::cout << "  [" << count << "] " << action << "\n";
-				combatActionHistory.push(action);  // Restore
-				count++;
-			}
-			std::cout << "\n";
-		}
 
 		if (currentZombie == nullptr || currentZombie->getHealth() <= 0) {
 			if (currentZombie != nullptr) {
@@ -758,7 +739,28 @@ CombatResult GameplayEngine::conductCombat() {
 
 		// Display player stats
 		std::cout << "  YOU: " << currentPlayer->getHealth() << "/" << currentPlayer->getMaxHealth() << " HP\n";
-		std::cout << "  Weapon: " << currentPlayer->getEquippedWeapon() << "\n\n";
+		std::cout << "  Weapon: " << currentPlayer->getEquippedWeapon() << "\n";
+		
+		// Display combat history
+		if (!combatActionHistory.isEmpty()) {
+			std::cout << "\n  RECENT ACTIONS:\n";
+			Stack<std::string> tempStack;
+			
+			// Copy to temp (reverses order)
+			while (!combatActionHistory.isEmpty()) {
+				tempStack.push(combatActionHistory.pop());
+			}
+			
+			// Display and restore
+			int count = 1;
+			while (!tempStack.isEmpty() && count <= MAX_COMBAT_HISTORY) {
+				std::string action = tempStack.pop();
+				std::cout << "  [" << count << "] " << action << "\n";
+				combatActionHistory.push(action);  // Restore
+				count++;
+			}
+		}
+		std::cout << "\n";
 
 		std::cout << "  [1] Attack  [2] Dodge  [3] Item  [4] Flee\n";
 		std::cout << "  Choice: ";
