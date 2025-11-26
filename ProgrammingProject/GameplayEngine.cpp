@@ -251,6 +251,15 @@ void GameplayEngine::populateLocationLoot() {
 		Item food("loot_002", "Canned Food", Item::Category::FOOD,
 			"Restores 30 hunger", 3, 4, true, true, 0, 30, 0, 0);
 		currentLocationLoot.push_back(Loot("loot_002", food, Direction::RIGHT));
+		
+		// NEW: More materials
+		Item cloth("mat_cloth_city", "Cloth", Item::Category::MATERIAL,
+			"Torn fabric for crafting", 3, 2, false, false, 0, 0, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_cloth_city", cloth, Direction::UP));
+		
+		Item wire("mat_wire_city", "Wire", Item::Category::MATERIAL,
+			"Useful for repairs", 2, 1, false, false, 0, 0, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_wire_city", wire, Direction::DOWN));
 	}
 	else if (locID == "loc_industrial") {
 		Item axe("loot_004", "Axe", Item::Category::WEAPON,
@@ -261,6 +270,15 @@ void GameplayEngine::populateLocationLoot() {
 		Item cloth("mat_cloth", "Cloth", Item::Category::MATERIAL,
 			"Used for crafting", 2, 2, false, false, 0, 0, 0, 0);
 		currentLocationLoot.push_back(Loot("mat_cloth", cloth, Direction::DOWN));
+		
+		// NEW: More materials
+		Item metalParts("mat_metal_parts", "Metal Parts", Item::Category::MATERIAL,
+			"Scrap metal pieces", 4, 3, false, false, 0, 0, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_metal_parts", metalParts, Direction::UP));
+		
+		Item wire("mat_wire_industrial", "Wire", Item::Category::MATERIAL,
+			"Industrial wire", 3, 1, false, false, 0, 0, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_wire_industrial", wire, Direction::RIGHT));
 	}
 	else if (locID == "loc_hollow_woods") {
 		Item rifle("loot_rifle", "Hunting Rifle", Item::Category::WEAPON,
@@ -271,6 +289,15 @@ void GameplayEngine::populateLocationLoot() {
 		Item herbs("mat_herbs", "Herbs", Item::Category::MATERIAL,
 			"Used for potions", 5, 1, false, false, 0, 0, 0, 0);
 		currentLocationLoot.push_back(Loot("mat_herbs", herbs, Direction::LEFT));
+		
+		// NEW: More materials
+		Item food("mat_food_woods", "Food Rations", Item::Category::FOOD,
+			"Preserved food", 2, 3, true, true, 0, 20, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_food_woods", food, Direction::RIGHT));
+		
+		Item bandages("mat_bandages_woods", "Bandages", Item::Category::MATERIAL,
+			"Medical supplies", 3, 2, false, false, 0, 0, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_bandages_woods", bandages, Direction::DOWN));
 	}
 	else if (locID == "loc_cemetery") {
 		Item bandage("loot_cem", "Bandage", Item::Category::MEDICAL,
@@ -280,11 +307,31 @@ void GameplayEngine::populateLocationLoot() {
 		Item cloth("mat_cloth2", "Cloth", Item::Category::MATERIAL,
 			"Crafting material", 4, 2, false, false, 0, 0, 0, 0);
 		currentLocationLoot.push_back(Loot("mat_cloth2", cloth, Direction::RIGHT));
+		
+		// NEW: More materials
+		Item bandages("mat_bandages_cem", "Bandages", Item::Category::MATERIAL,
+			"First aid supplies", 4, 2, false, false, 0, 0, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_bandages_cem", bandages, Direction::LEFT));
+	}
+	else if (locID == "loc_old_mill") {
+		// NEW: Add loot to Old Mill
+		Item metalParts("mat_metal_mill", "Metal Parts", Item::Category::MATERIAL,
+			"Rusty metal pieces", 3, 3, false, false, 0, 0, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_metal_mill", metalParts, Direction::LEFT));
+		
+		Item food("mat_food_mill", "Food Rations", Item::Category::FOOD,
+			"Old canned food", 2, 3, true, true, 0, 25, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_food_mill", food, Direction::RIGHT));
 	}
 	else if (locID == "loc_canal") {
 		Item water("mat_water", "Water", Item::Category::MATERIAL,
 			"Can be used for potions", 3, 2, false, false, 0, 0, 0, 0);
 		currentLocationLoot.push_back(Loot("mat_water", water, Direction::DOWN));
+		
+		// NEW: More materials
+		Item chemicals("mat_chemicals_canal", "Chemical Supplies", Item::Category::MATERIAL,
+			"Industrial chemicals", 2, 2, false, false, 0, 0, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_chemicals_canal", chemicals, Direction::UP));
 	}
 	else if (locID == "loc_pump_station") {
 		Item antibiotics("mat_antibiotics", "Antibiotics", Item::Category::MATERIAL,
@@ -294,6 +341,15 @@ void GameplayEngine::populateLocationLoot() {
 		Item scrap("mat_scrap", "Scrap Metal", Item::Category::MATERIAL,
 			"For weapon crafting", 5, 1, false, false, 0, 0, 0, 0);
 		currentLocationLoot.push_back(Loot("mat_scrap", scrap, Direction::RIGHT));
+		
+		// NEW: More materials
+		Item wire("mat_wire_pump", "Wire", Item::Category::MATERIAL,
+			"Electrical wire", 4, 1, false, false, 0, 0, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_wire_pump", wire, Direction::UP));
+		
+		Item chemicals("mat_chemicals_pump", "Chemical Supplies", Item::Category::MATERIAL,
+			"Lab chemicals", 2, 2, false, false, 0, 0, 0, 0);
+		currentLocationLoot.push_back(Loot("mat_chemicals_pump", chemicals, Direction::DOWN));
 	}
 	
 	// CRITICAL FIX: Mark loot as picked up if it's in the pickedUpLootIDs list
@@ -386,27 +442,43 @@ void GameplayEngine::moveInDirection(Direction direction) {
 	int eventRoll = rand() % 100;
 	bool eventOccurred = false;
 	
-	// Priority: Loot (30%) > Clue (25%) > Combat (30%) > Hazard (10%) > Nothing (5%)
-	if (eventRoll < 30 && !eventOccurred) {
-		// Loot event
+	// Apply scavenging skill bonus to loot chance
+	float scavengeBonus = currentPlayer->getSkillTree().getTotalScavengeBonus();
+	int lootChance = 45; // Base 45%
+	if (scavengeBonus > 0) {
+		lootChance = (int)(45 * (1.0f + scavengeBonus));
+		if (lootChance > 70) lootChance = 70; // Cap at 70%
+	}
+	
+	// Priority: Loot (45% + bonus) > Clue (35%) > Combat (15%) > Hazard (5%)
+	if (eventRoll < lootChance && !eventOccurred) {
+		// Loot event (increased from 30% to 45%, with scavenge bonus)
 		checkForLoot(direction);
 		eventOccurred = true;
+		
+		// Scavenger bonus: chance for extra loot!
+		if (scavengeBonus > 0 && rand() % 100 < (int)(scavengeBonus * 100)) {
+			std::cout << "  [SCAVENGER] You spot extra loot nearby!\n";
+			// Find another loot in a different direction
+			Direction extraDir = static_cast<Direction>((static_cast<int>(direction) + 1) % 4);
+			checkForLoot(extraDir);
+		}
 	}
-	else if (eventRoll < 55 && !eventOccurred) {
-		// Clue event
+	else if (eventRoll < 80 && !eventOccurred) {
+		// Clue event (increased from 25% to 35%, cumulative 45+35=80)
 		checkForClue(direction);
 		eventOccurred = true;
 	}
-	else if (eventRoll < 85 && currentLocation->getZombieCount() > 0 && !eventOccurred) {
-		// Combat event
+	else if (eventRoll < 95 && currentLocation->getZombieCount() > 0 && !eventOccurred) {
+		// Combat event (reduced from 30% to 15%)
 		std::cout << "  [!] Zombies detected!\n\n";
 		AudioEngine::getInstance()->playCombatAttackSound();
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		startCombat();
 		eventOccurred = true;
 	}
-	else if (eventRoll < 95 && !eventOccurred) {
-		// Hazard event
+	else if (eventRoll < 100 && !eventOccurred) {
+		// Hazard event (5%)
 		checkForHazard();
 		eventOccurred = true;
 	}
@@ -609,9 +681,32 @@ CombatResult GameplayEngine::conductCombat() {
 		system(CLEAR_SCREEN);
 		std::cout << "\n  COMBAT\n\n";
 
+		// Display combat history
+		if (!combatActionHistory.isEmpty()) {
+			std::cout << "  RECENT ACTIONS:\n";
+			Stack<std::string> tempStack;
+
+			// Copy to temp (reverses order)
+			while (!combatActionHistory.isEmpty()) {
+				tempStack.push(combatActionHistory.pop());
+			}
+
+			// Display and restore
+			int count = 1;
+			while (!tempStack.isEmpty() && count <= MAX_COMBAT_HISTORY) {
+				std::string action = tempStack.pop();
+				std::cout << "  [" << count << "] " << action << "\n";
+				combatActionHistory.push(action);  // Restore
+				count++;
+			}
+			std::cout << "\n";
+		}
+
 		if (currentZombie == nullptr || currentZombie->getHealth() <= 0) {
 			if (currentZombie != nullptr) {
 				std::cout << "  [KILL] " << currentZombie->getType() << " defeated!\n";
+
+				combatActionHistory.push("Killed " + currentZombie->getType());
 				
 				// Trigger zombie death effects (e.g., Boomer explosion)
 				currentZombie->onDeath(currentPlayer);
@@ -693,6 +788,8 @@ CombatResult GameplayEngine::conductCombat() {
 				currentZombie->takeDamage(damage);
 				result.playerDamageDealt += damage;
 
+				combatActionHistory.push("Dealt " + std::to_string(damage) + " dmg to " + currentZombie->getType());
+
 				if (currentZombie->getHealth() > 0) {
 					// Zombie counter-attack with special ability chance
 					int zombieAttackDmg = currentZombie->getDamage();
@@ -707,6 +804,8 @@ CombatResult GameplayEngine::conductCombat() {
 						std::cout << "  Zombie special attack for " << specialDmg << " damage!\n";
 						currentPlayer->takeDamage(specialDmg);
 						result.playerDamageTaken += specialDmg;
+
+						combatActionHistory.push("Took " + std::to_string(specialDmg) + " dmg from " + currentZombie->getType());
 					} else {
 						std::cout << "  Zombie attacks for " << zombieAttackDmg << " damage!\n";
 						currentPlayer->takeDamage(zombieAttackDmg);

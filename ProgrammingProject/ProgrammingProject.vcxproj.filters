@@ -180,18 +180,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="GAME_IMPLEMENTATION_GUIDE.md" />
-    <None Include="SOUND_EFFECTS_GUIDE.md" />
-    <None Include="FINAL_IMPLEMENTATION_SUMMARY.md" />
-    <None Include="IMPLEMENTATION_CHECKLIST.md" />
-    <None Include="PROJECT_OVERVIEW.md" />
-    <None Include="PHASE_6_COMPLETE.md" />
-    <None Include="CRITICAL_FIXES_SUMMARY.md" />
-    <None Include="CRAFTING_SKILLS_GUIDE.md" />
-    <None Include="OUTBREAK_COMPLETE_STATUS.md" />
-    <None Include="SKILL_TREE_FIX_SUMMARY.md" />
-    <None Include="FINAL_BUILD_STATUS.md" />
-    <None Include="SKILL_TREE_COMPLETE_FIX.md" />
-  </ItemGroup>
 </Project>

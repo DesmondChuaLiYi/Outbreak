@@ -22,7 +22,7 @@ void CraftingSystem::initializeRecipes() {
 			"Restores 25 HP", 1, 4, true, true, 25, 0, 0, 0),
 		3
 	);
-	firstAidRecipe->addMaterial("start_bandage", 1);  // 1 Starting Bandage
+	firstAidRecipe->addMaterial("mat_bandages_woods", 1);  // 1 Bandage
 	firstAidRecipe->addMaterial("mat_cloth", 1);      // 1 Cloth
 	addRecipe(firstAidRecipe);
 
@@ -35,7 +35,7 @@ void CraftingSystem::initializeRecipes() {
 			"Restores 50 hunger", 1, 5, true, true, 0, 50, 0, 0),
 		4
 	);
-	fortifiedFoodRecipe->addMaterial("start_food", 1); // 1 Starting Food
+	fortifiedFoodRecipe->addMaterial("mat_food_woods", 1); // 1 Food Rations
 	fortifiedFoodRecipe->addMaterial("mat_herbs", 1);  // 1 Herbs
 	addRecipe(fortifiedFoodRecipe);
 
@@ -62,7 +62,7 @@ void CraftingSystem::initializeRecipes() {
 		4
 	);
 	infectionTreatmentRecipe->addMaterial("mat_antibiotics", 2); // 2 Antibiotics
-	infectionTreatmentRecipe->addMaterial("start_bandage", 1);   // 1 Bandage
+	infectionTreatmentRecipe->addMaterial("mat_bandages_cem", 1);   // 1 Bandage
 	addRecipe(infectionTreatmentRecipe);
 
 	// Recipe 5: Reinforced Weapon (from scrap metal + wire)

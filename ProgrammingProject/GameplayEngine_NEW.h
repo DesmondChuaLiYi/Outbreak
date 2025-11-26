@@ -1,75 +1,63 @@
 #ifndef GAMEPLAYENGINE_H
 #define GAMEPLAYENGINE_H
 
-#include "Player.h"
-#include "Location.h"
-#include "Zombie.h"
-#include "Item.h"
-#include "ClueJournal.h"
-#include "Queue.h"
-#include "Stack.h"
-#include "Crafting.h"
 #include <string>
 #include <vector>
+#include "Player.h"
+#include "Location.h"
+#include "ClueJournal.h"
+#include "Item.h"
+#include "Zombie.h"
+#include "Queue.h"
+#include "Stack.h"
+
+// Forward declarations
+class Player;
+class Location;
+class ClueJournal;
 
 // ============================================================================
-// DIRECTION ENUM
+// ENUMS & STRUCTS
 // ============================================================================
+
 enum class Direction {
-	UP,
-	DOWN,
+	CENTER,
 	LEFT,
 	RIGHT,
-	CENTER
+	UP,
+	DOWN
 };
 
-// ============================================================================
-// LOOT STRUCT - Item at specific location
-// ============================================================================
+enum class CombatResult {
+	VICTORY,
+	DEFEAT,
+	FLED
+};
+
 struct Loot {
 	std::string lootID;
 	Item item;
 	Direction location;
 	bool isPickedUp;
 
-	Loot(const std::string& id, const Item& it, Direction dir)
-		: lootID(id), item(it), location(dir), isPickedUp(false) {
-	}
+	Loot(const std::string& id, const Item& itm, Direction loc)
+		: lootID(id), item(itm), location(loc), isPickedUp(false) {}
 };
 
-// ============================================================================
-// CLUE LOCATION STRUCT - Lore item at specific location
-// ============================================================================
 struct ClueLocation {
 	int clueID;
 	std::string clueName;
 	Direction location;
 	bool collected;
 
-	ClueLocation(int id, const std::string& name, Direction dir)
-		: clueID(id), clueName(name), location(dir), collected(false) {
-	}
+	ClueLocation(int id, const std::string& name, Direction loc)
+		: clueID(id), clueName(name), location(loc), collected(false) {}
 };
 
 // ============================================================================
-// COMBAT RESULT STRUCT - Results from a combat encounter
+// GAMEPLAYENGINE CLASS
 // ============================================================================
-struct CombatResult {
-	bool playerWon;
-	int playerDamageDealt;
-	int playerDamageTaken;
-	int zombiesKilled;
-	int zombiesRemaining;
 
-	CombatResult()
-		: playerWon(false), playerDamageDealt(0), playerDamageTaken(0),
-		zombiesKilled(0), zombiesRemaining(0) {
-	}
-};
-
-// ============================================================================
-// GAMEPLAY ENGINE - Core exploration, combat, and progression
-// ============================================================================
 class GameplayEngine {
 private:
 	// Singleton instance
@@ -82,18 +70,15 @@ private:
 
 	// Combat state
 	Queue<Zombie*> currentWave;
+	Zombie* currentZombie;
 	int currentWaveNumber;
 	int maxWavesPerLocation;
+	Stack<std::string> combatActionHistory; // NEW: Combat history tracking
+	static const int MAX_COMBAT_HISTORY = 5; // NEW: Max history entries
 
-	// Combat history
-	Stack<std::string> combatActionHistory;
-	static const int MAX_COMBAT_HISTORY = 5;
-
-	// Movement & exploration state
+	// Exploration state
 	int movementSteps;
-	int stepsToNewLocation;  // Now 12 instead of 15
-
-	// Location state
+	int stepsToNewLocation;
 	std::vector<Loot> currentLocationLoot;
 	std::vector<ClueLocation> currentLocationClues;
 	std::vector<std::string> pickedUpLootIDs; // Track picked up loot globally

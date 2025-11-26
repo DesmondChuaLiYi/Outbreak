@@ -543,10 +543,17 @@ Player* GameEngine::createCharacter() {
 
 	std::string playerName;
 	centerText("Enter your character name: ");
+	std::cin.ignore(10000, '\n');  // FIX: Clear input buffer
 	std::getline(std::cin, playerName);
 
-	if (playerName.empty()) {
-		playerName = "Tony Redgrave";
+	// Validate name
+	while (playerName.empty() || playerName.length() > 20) {
+		if (playerName.empty()) {
+			centerText("Name cannot be empty! Try again: ");
+		} else {
+			centerText("Name too long (max 20 chars)! Try again: ");
+		}
+		std::getline(std::cin, playerName);
 	}
 
 	clearConsole();
@@ -1431,6 +1438,12 @@ void GameEngine::runExplorationLoop(Player* player) {
 			}
 			else if (choice == 3) {
 				// Quit to main menu
+				std::cout << "\n  Returning to main menu...\n";
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				
+				// CRITICAL: Reset singleton instance for clean state
+				GameplayEngine::destroyInstance();
+				
 				exploring = false;
 			}
 		}
