@@ -1,6 +1,7 @@
 #include "GameplayEngine.h"
 #include "AudioEngine.h"
 #include "GameEngine.h"
+#include "AIStoryteller.h"
 #include "CommonInfected.h"
 #include "Boomer.h"
 #include "Spitter.h"
@@ -75,6 +76,11 @@ void GameplayEngine::initialize(Player* player, Location* location, ClueJournal*
 	movementSteps = 0;
 	stepsToNewLocation = 0;
 	hasExploredNewArea = false;
+
+	// Clear combat action history (important when loading a saved game)
+	while (!combatActionHistory.isEmpty()) {
+		combatActionHistory.pop();
+	}
 
 	// Always set location to ensure proper initialization
 	if (location != nullptr) {
@@ -438,6 +444,36 @@ void GameplayEngine::moveInDirection(Direction direction) {
 	movementSteps++;
 	stepsToNewLocation++;
 	
+	// AI STORYTELLER: Update with current player state
+	AIStoryteller* aiStoryteller = AIStoryteller::getInstance();
+	aiStoryteller->update(currentPlayer, movementSteps);
+	
+	// AI STORYTELLER INFLUENCE #3: Random events based on player state
+	if (aiStoryteller->shouldTriggerEvent()) {
+		std::string event = aiStoryteller->generateRandomEvent();
+		aiStoryteller->handleEvent(event);
+		
+		// Apply event effects
+		if (event == "SUPPLY_DROP" || event == "MEDICAL_CACHE") {
+			// Healing event - restore some HP
+			int healAmount = (event == "SUPPLY_DROP") ? 50 : 20;
+			int newHP = currentPlayer->getHealth() + healAmount;
+			if (newHP > currentPlayer->getMaxHealth()) newHP = currentPlayer->getMaxHealth();
+			currentPlayer->setHealth(newHP);
+			std::cout << "  [HEALED] Restored " << healAmount << " HP!\n";
+		}
+		else if (event == "HORDE_INCOMING") {
+			startCombat();
+			return;  // Skip normal exploration
+		}
+		else if (event == "SAFE_ZONE") {
+			int healAmount = 30;
+			int newHP = currentPlayer->getHealth() + healAmount;
+			if (newHP > currentPlayer->getMaxHealth()) newHP = currentPlayer->getMaxHealth();
+			currentPlayer->setHealth(newHP);
+		}
+	}
+	
 	// Determine ONE event type (better pacing - no simultaneous events)
 	int eventRoll = rand() % 100;
 	bool eventOccurred = false;
@@ -455,6 +491,16 @@ void GameplayEngine::moveInDirection(Direction direction) {
 		// Loot event (increased from 30% to 45%, with scavenge bonus)
 		checkForLoot(direction);
 		eventOccurred = true;
+		
+		// AI STORYTELLER INFLUENCE #2: Bonus healing when player is struggling
+		AIStoryteller* ai = AIStoryteller::getInstance();
+		if (ai->shouldGrantBonusLoot()) {
+			int bonusHeal = 20;
+			int newHP = currentPlayer->getHealth() + bonusHeal;
+			if (newHP > currentPlayer->getMaxHealth()) newHP = currentPlayer->getMaxHealth();
+			currentPlayer->setHealth(newHP);
+			std::cout << "  [AI BONUS] Found emergency supplies! Restored " << bonusHeal << " HP!\n";
+		}
 		
 		// Scavenger bonus: chance for extra loot!
 		if (scavengeBonus > 0 && rand() % 100 < (int)(scavengeBonus * 100)) {
@@ -647,6 +693,10 @@ void GameplayEngine::spawnZombieWave() {
 	}
 
 	int zombieCount = 3 + (rand() % 4); // 3-6 zombies per wave
+	
+	// AI STORYTELLER INFLUENCE #1: Adjust zombie count based on player state
+	AIStoryteller* ai = AIStoryteller::getInstance();
+	zombieCount = ai->adjustZombieCount(zombieCount);
 
 	for (int i = 0; i < zombieCount; ++i) {
 		Zombie* zombie = nullptr;
@@ -740,24 +790,41 @@ CombatResult GameplayEngine::conductCombat() {
 		// Display player stats
 		std::cout << "  YOU: " << currentPlayer->getHealth() << "/" << currentPlayer->getMaxHealth() << " HP\n";
 		std::cout << "  Weapon: " << currentPlayer->getEquippedWeapon() << "\n";
-		
-		// Display combat history
+
+		// Display combat history (latest actions first)
 		if (!combatActionHistory.isEmpty()) {
 			std::cout << "\n  RECENT ACTIONS:\n";
+
+			// Create array to store latest actions
+			std::string actions[MAX_COMBAT_HISTORY];
+			int actionCount = 0;
+
+			// Pop all actions into temp stack to reverse order
 			Stack<std::string> tempStack;
-			
-			// Copy to temp (reverses order)
 			while (!combatActionHistory.isEmpty()) {
 				tempStack.push(combatActionHistory.pop());
 			}
-			
-			// Display and restore
-			int count = 1;
-			while (!tempStack.isEmpty() && count <= MAX_COMBAT_HISTORY) {
+
+			// Restore to original and collect latest MAX_COMBAT_HISTORY actions
+			while (!tempStack.isEmpty()) {
 				std::string action = tempStack.pop();
-				std::cout << "  [" << count << "] " << action << "\n";
-				combatActionHistory.push(action);  // Restore
-				count++;
+				combatActionHistory.push(action);  // Restore to original stack
+
+				// Store in array (shift older actions down)
+				if (actionCount < MAX_COMBAT_HISTORY) {
+					actions[actionCount++] = action;
+				} else {
+					// Shift all actions down and add new one at end
+					for (int i = 0; i < MAX_COMBAT_HISTORY - 1; i++) {
+						actions[i] = actions[i + 1];
+					}
+					actions[MAX_COMBAT_HISTORY - 1] = action;
+				}
+			}
+
+			// Display latest actions first (reverse array order)
+			for (int i = actionCount - 1; i >= 0; i--) {
+				std::cout << "  [" << (actionCount - i) << "] " << actions[i] << "\n";
 			}
 		}
 		std::cout << "\n";
@@ -832,12 +899,14 @@ CombatResult GameplayEngine::conductCombat() {
 		case 2: { // Dodge
 			if (rand() % 100 < 40) {
 				std::cout << "\n  [DODGE] Avoided!\n";
+				combatActionHistory.push("Dodged " + currentZombie->getType() + "'s attack");
 			}
 			else {
 				int dmg = currentZombie->getDamage() / 2;
 				std::cout << "\n  [PARTIAL] Take " << dmg << " damage!\n";
 				currentPlayer->takeDamage(dmg);
 				result.playerDamageTaken += dmg;
+				combatActionHistory.push("Took " + std::to_string(dmg) + " dmg (partial dodge)");
 			}
 			break;
 		}
@@ -850,6 +919,7 @@ CombatResult GameplayEngine::conductCombat() {
 		case 4: { // Flee
 			if (rand() % 100 < 50) {
 				std::cout << "\n  [ESCAPED]\n";
+				combatActionHistory.push("Fled from combat");
 				result.playerWon = false;
 				while (!currentWave.isEmpty()) delete currentWave.dequeue();
 				if (currentZombie) delete currentZombie;
@@ -860,6 +930,13 @@ CombatResult GameplayEngine::conductCombat() {
 			}
 			else {
 				std::cout << "\n  [FAILED] Couldn't escape!\n";
+				combatActionHistory.push("Failed to flee");
+				// Zombie punishes failed escape
+				int zombieAttackDmg = currentZombie->getDamage();
+				std::cout << "  Zombie attacks while you flee for " << zombieAttackDmg << " damage!\n";
+				currentPlayer->takeDamage(zombieAttackDmg);
+				result.playerDamageTaken += zombieAttackDmg;
+				combatActionHistory.push("Took " + std::to_string(zombieAttackDmg) + " dmg (flee failed)");
 			}
 			break;
 		}
@@ -1089,11 +1166,16 @@ void GameplayEngine::displayInventory() {
 								newHP = currentPlayer->getMaxHealth();
 							}
 							currentPlayer->setHealth(newHP);
-							std::cout << "\n  [USED] " << item.getName() << "! Restored " 
+							std::cout << "\n  [USED] " << item.getName() << "! Restored "
 								<< item.getHealthRestore() << " HP.\n";
 							itemUsed = true;
+
+							// Track in combat history if in combat
+							if (inCombat) {
+								combatActionHistory.push("Used " + item.getName() + " (+" + std::to_string(item.getHealthRestore()) + " HP)");
+							}
 						}
-						
+
 						// Food items (restore hunger)
 						if (item.getCategory() == Item::Category::FOOD) {
 							int hungerRestore = 30; // Default food restores 30 hunger
@@ -1102,9 +1184,14 @@ void GameplayEngine::displayInventory() {
 								newHunger = currentPlayer->getMaxHunger();
 							}
 							currentPlayer->setHunger(newHunger);
-							std::cout << "\n  [USED] " << item.getName() << "! Restored " 
+							std::cout << "\n  [USED] " << item.getName() << "! Restored "
 								<< hungerRestore << " Hunger.\n";
 							itemUsed = true;
+
+							// Track in combat history if in combat
+							if (inCombat) {
+								combatActionHistory.push("Used " + item.getName() + " (+" + std::to_string(hungerRestore) + " Hunger)");
+							}
 						}
 						
 						if (itemUsed) {
@@ -1297,7 +1384,9 @@ bool GameplayEngine::travelToLocation(const std::string& locationID) {
 		return false;
 	}
 
+	// CRITICAL: Update BOTH GameplayEngine and GameEngine locations for synchronization
 	setCurrentLocation(newLocation);
+	engine->setCurrentLocation(newLocation);  // Keep GameEngine in sync
 
 	system(CLEAR_SCREEN);
 	std::cout << "\n  Traveling to " << newLocation->getName() << "...\n\n";

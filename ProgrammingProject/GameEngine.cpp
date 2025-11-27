@@ -543,7 +543,6 @@ Player* GameEngine::createCharacter() {
 
 	std::string playerName;
 	centerText("Enter your character name: ");
-	std::cin.ignore(10000, '\n');  // FIX: Clear input buffer
 	std::getline(std::cin, playerName);
 
 	// Validate name
@@ -1068,12 +1067,11 @@ Player* GameEngine::loadGame(int slotNumber) {
 		savedExplorationProgress = explorationProgress;
 		savedMovementSteps = movementSteps;
 
-		// Restore picked up loot IDs to GameplayEngine (will be applied in handleLoadGame)
-		GameplayEngine* gameplay = GameplayEngine::getInstance();
-		gameplay->setPickedUpLootIDs(pickedUpLootIDs);
+		// Store picked up loot IDs to restore AFTER GameplayEngine initialize (in handleLoadGame)
+		savedPickedUpLootIDs = pickedUpLootIDs;
 
-		// Restore collected clues to journal
-		journal->setCollectedClueIDs(collectedClueIDs);
+		// Store collected clue IDs to restore AFTER initialize (in handleLoadGame)
+		savedCollectedClueIDs = collectedClueIDs;
 
 		return player;
 	}
@@ -1138,6 +1136,12 @@ void GameEngine::handleNewGame() {
 
 	std::string name;
 	std::cout << "  Enter name (or press ENTER for 'Tony Redgrave'): ";
+
+	// Clear any leftover characters in input buffer before getline
+	if (std::cin.peek() == '\n') {
+		std::cin.ignore();
+	}
+
 	std::getline(std::cin, name);
 	
 	if (name.empty()) name = "Tony Redgrave";
@@ -1177,6 +1181,17 @@ void GameEngine::handleNewGame() {
 }
 
 void GameEngine::handleLoadGame() {
+	// CRITICAL: Reset and reinitialize journal BEFORE loading
+	// This ensures all clue definitions exist before marking them as collected
+	if (journal != nullptr) {
+		delete journal;
+		journal = nullptr;
+	}
+	journal = new ClueJournal();
+
+	// Reinitialize all lore items (clue definitions)
+	initializeAllLoreItems();
+
 	system("cls");
 	std::cout << "\n\n" << std::string(80, '=') << "\n";
 	std::cout << "  LOAD GAME\n";
@@ -1198,6 +1213,18 @@ void GameEngine::handleLoadGame() {
 
 			// Initialize GameplayEngine FIRST before displaying chapter
 			GameplayEngine* gameplay = GameplayEngine::getInstance();
+
+			// CRITICAL: Restore picked up loot IDs BEFORE initialize is called!
+			// initialize() will call populateLocationLoot() which checks this list
+			gameplay->setPickedUpLootIDs(savedPickedUpLootIDs);
+			savedPickedUpLootIDs.clear();  // Clear temporary storage
+
+			// CRITICAL: Restore collected clues BEFORE initialize is called!
+			// initialize() will call populateLocationClues() which checks the journal
+			journal->setCollectedClueIDs(savedCollectedClueIDs);
+			savedCollectedClueIDs.clear();  // Clear temporary storage
+
+			// Now initialize (this will populate loot/clues and mark them correctly)
 			gameplay->initialize(player, getCurrentLocation(), getJournal());
 
 			// Restore exploration progress

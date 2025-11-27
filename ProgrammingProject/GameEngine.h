@@ -28,6 +28,8 @@ private:
 	// Temporary storage for loaded game state
 	int savedExplorationProgress;
 	int savedMovementSteps;
+	std::vector<int> savedCollectedClueIDs;
+	std::vector<std::string> savedPickedUpLootIDs;
 
 	// Helper methods for initialization
 	void initializeAllLocations();

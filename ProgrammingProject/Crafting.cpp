@@ -22,8 +22,8 @@ void CraftingSystem::initializeRecipes() {
 			"Restores 25 HP", 1, 4, true, true, 25, 0, 0, 0),
 		3
 	);
-	firstAidRecipe->addMaterial("mat_bandages_woods", 1);  // 1 Bandage
-	firstAidRecipe->addMaterial("mat_cloth", 1);      // 1 Cloth
+	firstAidRecipe->addMaterial("Bandages", 1);  // Match by name
+	firstAidRecipe->addMaterial("Cloth", 1);      // Match by name
 	addRecipe(firstAidRecipe);
 
 	// Recipe 2: Fortified Food (from food and herbs)
@@ -35,8 +35,8 @@ void CraftingSystem::initializeRecipes() {
 			"Restores 50 hunger", 1, 5, true, true, 0, 50, 0, 0),
 		4
 	);
-	fortifiedFoodRecipe->addMaterial("mat_food_woods", 1); // 1 Food Rations
-	fortifiedFoodRecipe->addMaterial("mat_herbs", 1);  // 1 Herbs
+	fortifiedFoodRecipe->addMaterial("Food Rations", 1); // Match by name
+	fortifiedFoodRecipe->addMaterial("Herbs", 1);  // Match by name
 	addRecipe(fortifiedFoodRecipe);
 
 	// Recipe 3: Healing Potion (from herbs + water)
@@ -48,8 +48,8 @@ void CraftingSystem::initializeRecipes() {
 			"Restores 30 HP and 20 hunger", 1, 4, true, true, 30, 20, 0, 0),
 		5
 	);
-	healingPotionRecipe->addMaterial("mat_herbs", 2);  // 2 Herbs
-	healingPotionRecipe->addMaterial("mat_water", 1);  // 1 Water
+	healingPotionRecipe->addMaterial("Herbs", 2);  // Match by name
+	healingPotionRecipe->addMaterial("Water", 1);  // Match by name
 	addRecipe(healingPotionRecipe);
 
 	// Recipe 4: Infection Treatment (from antibiotics + bandages)
@@ -61,11 +61,11 @@ void CraftingSystem::initializeRecipes() {
 			"Cures 50% infection", 1, 3, true, true, 0, 0, 50, 0),
 		4
 	);
-	infectionTreatmentRecipe->addMaterial("mat_antibiotics", 2); // 2 Antibiotics
-	infectionTreatmentRecipe->addMaterial("mat_bandages_cem", 1);   // 1 Bandage
+	infectionTreatmentRecipe->addMaterial("Antibiotics", 2); // Match by name
+	infectionTreatmentRecipe->addMaterial("Bandages", 1);   // Match by name
 	addRecipe(infectionTreatmentRecipe);
 
-	// Recipe 5: Reinforced Weapon (from scrap metal + wire)
+	// Recipe 5: Reinforced Weapon (from scrap metal)
 	CraftingRecipe* reinforcedWeaponRecipe = new CraftingRecipe(
 		"craft_005",
 		"Reinforced Weapon",
@@ -74,7 +74,7 @@ void CraftingSystem::initializeRecipes() {
 			"Enhanced melee weapon. +5 bonus damage", 1, 8, false, true, 0, 0, 0, 5),
 		6
 	);
-	reinforcedWeaponRecipe->addMaterial("mat_scrap", 3);    // 3 Scrap Metal
+	reinforcedWeaponRecipe->addMaterial("Scrap Metal", 3);    // Match by name
 	addRecipe(reinforcedWeaponRecipe);
 }
 

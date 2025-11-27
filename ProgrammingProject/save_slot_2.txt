@@ -2,15 +2,15 @@ Tony Redgrave
 
 4
 59
-162
+228
 230
-loc_pump_station
+loc_sanctuary
 1
-7
-14
-14
+10
+0
+0
 Hunting Rifle
-230
+290
 6
 11
 |Canned Food|2|Restores 30 hunger|3|2|1|1|0|30|0|0

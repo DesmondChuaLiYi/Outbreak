@@ -1,29 +1,22 @@
-Tony Redgrave
+Vergil
 
+1
+8
+125
+125
+loc_ruined_city
+1
+1
+3
+3
+Knife
+0
 2
-55
-167
-210
-loc_old_mill
+8
+|Bandage|1|Restores 15 HP|2|3|1|1|15|0|0|0
+|Canned Food|2|Restores 30 hunger|2|4|1|1|0|30|0|0
+|Wire|3|Useful for repairs|2|1|0|0|0|0|0|0
 1
+mat_wire_city
 1
-0
-0
-Hunting Rifle
-190
-3
-13
-|Bandage|1|Restores 15 HP|3|1|1|1|15|0|0|0
-|Bandage|1|Restores 15 HP|2|1|1|1|15|0|0|0
-|Canned Food|2|Restores 30 hunger|3|2|1|1|0|30|0|0
-|Axe|0|Heavy axe. 25 melee damage|1|4|0|1|0|0|0|25
-|Hunting Rifle|0|Powerful rifle. 40 damage|1|5|0|1|0|0|0|40
-4
-loot_ruined_city_001
-loot_ruined_city_002
-loot_industrial_001
-loot_woods_001
-3
-1
-6
-11
+2
