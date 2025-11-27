@@ -55,8 +55,8 @@ public:
 	// Get singleton instance
 	static AudioEngine* getInstance();
 
-	// Play background music (supports both WAV via DirectSound and MP3 via MCI)
-	bool playBackgroundMusic(const std::string& musicFilePath = "Audio\\Music\\background_music.mp3");
+	// Play background music (DirectSound - WAV only, DirectX requirement)
+	bool playBackgroundMusic(const std::string& musicFilePath = "Audio\\Music\\background_music.wav");
 
 	// Stop background music
 	bool stopBackgroundMusic();

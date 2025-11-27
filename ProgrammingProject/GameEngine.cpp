@@ -1280,7 +1280,6 @@ void GameEngine::handleLoadGame() {
 			gameplay->setExplorationProgress(savedExplorationProgress);
 			gameplay->setMovementSteps(savedMovementSteps);
 
-			// Display current chapter and location info
 			system("cls");
 			if (currentLocation != nullptr) {
 				// Update currentChapter from location

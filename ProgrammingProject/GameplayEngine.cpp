@@ -102,6 +102,7 @@ void GameplayEngine::setCurrentLocation(Location* location) {
 		// ALWAYS repopulate - this is critical!
 		populateLocationLoot();
 		populateLocationClues();
+		AudioEngine::getInstance()->playLocationMusic(location->getID());
 
 		// Set max waves based on location's hazard
 		if (location->getHazardDamage() > 5) {

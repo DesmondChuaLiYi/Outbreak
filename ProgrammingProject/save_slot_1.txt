@@ -2,28 +2,20 @@ Tony Redgrave
 
 1
 8
+101
 125
-125
-loc_industrial
+loc_ruined_city
+1
 1
 2
-0
-0
+2
 Knife
 0
 2
-17
+7
 |Bandage|1|Restores 15 HP|2|3|1|1|15|0|0|0
 |Canned Food|2|Restores 30 hunger|2|4|1|1|0|30|0|0
-|Bandage|1|Restores 15 HP|2|3|1|1|15|0|0|0
-|Cloth|3|Torn fabric for crafting|3|2|0|0|0|0|0|0
-|Wire|3|Useful for repairs|2|1|0|0|0|0|0|0
-|Canned Food|2|Restores 30 hunger|3|4|1|1|0|30|0|0
-4
-loot_001
-mat_cloth_city
-mat_wire_city
-loot_002
+0
 1
-1
+2
 0
