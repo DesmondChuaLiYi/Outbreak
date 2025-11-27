@@ -250,3 +250,55 @@ bool SkillTree::hasUnlockedSkill(const std::string& skillName) const {
 	}
 	return false;
 }
+
+// Helper function to traverse tree and collect unlocked skills
+void getUnlockedSkillsRecursive(SkillNode* node, std::vector<std::string>& skillIDs, std::vector<int>& levels) {
+	if (node == nullptr) {
+		return;
+	}
+
+	// If skill is unlocked, save its ID and level
+	if (node->isUnlocked()) {
+		skillIDs.push_back(node->getSkillID());
+		levels.push_back(node->getLevel());
+	}
+
+	// Recursively check children
+	for (auto it = node->getChildren().begin(); it != node->getChildren().end(); ++it) {
+		SkillNode* child = *it;
+		getUnlockedSkillsRecursive(child, skillIDs, levels);
+	}
+}
+
+void SkillTree::getUnlockedSkillData(std::vector<std::string>& skillIDs, std::vector<int>& levels) const {
+	skillIDs.clear();
+	levels.clear();
+
+	// Traverse all root skills and their children
+	for (auto it = fRootSkills.begin(); it != fRootSkills.end(); ++it) {
+		SkillNode* root = *it;
+		getUnlockedSkillsRecursive(root, skillIDs, levels);
+	}
+}
+
+void SkillTree::restoreUnlockedSkills(const std::vector<std::string>& skillIDs, const std::vector<int>& levels) {
+	if (skillIDs.size() != levels.size()) {
+		return; // Data mismatch
+	}
+
+	// Restore each skill
+	for (size_t i = 0; i < skillIDs.size(); i++) {
+		SkillNode* skill = getSkill(skillIDs[i]);
+		if (skill != nullptr) {
+			// Unlock the skill
+			skill->unlockSkill();
+
+			// Restore level (level up additional times if needed)
+			int currentLevel = skill->getLevel();
+			int targetLevel = levels[i];
+			for (int level = currentLevel; level < targetLevel; level++) {
+				skill->levelUpSkill();
+			}
+		}
+	}
+}

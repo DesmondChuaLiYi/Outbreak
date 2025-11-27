@@ -10,11 +10,10 @@
 int main() {
 	// Initialize singletons
 	GameEngine* engine = GameEngine::getInstance();
-	AudioEngine* audio = AudioEngine::getInstance();
+	AudioEngine* audio = AudioEngine::getInstance(); // Auto-plays background music
 
 	// Setup game
 	engine->initialize();
-	audio->playBackgroundMusic("background_music.mp3");
 
 	// Main game loop - returns to title screen after each session
 	bool gameRunning = true;

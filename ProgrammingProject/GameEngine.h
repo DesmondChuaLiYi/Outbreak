@@ -30,6 +30,8 @@ private:
 	int savedMovementSteps;
 	std::vector<int> savedCollectedClueIDs;
 	std::vector<std::string> savedPickedUpLootIDs;
+	std::vector<std::string> savedSkillIDs;
+	std::vector<int> savedSkillLevels;
 
 	// Helper methods for initialization
 	void initializeAllLocations();

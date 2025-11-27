@@ -4,6 +4,7 @@
 #include "HashTable.h"
 #include "SinglyLinkedList.h"
 #include <string>
+#include <vector>
 
 class SkillTree {
 private:
@@ -56,6 +57,10 @@ public:
 	// Utility
 	int getTotalUnlockedSkills() const;
 	bool hasUnlockedSkill(const std::string& skillName) const;
+
+	// Save/Load support
+	void getUnlockedSkillData(std::vector<std::string>& skillIDs, std::vector<int>& levels) const;
+	void restoreUnlockedSkills(const std::vector<std::string>& skillIDs, const std::vector<int>& levels);
 };
 
 #endif /* SKILLTREE_H */

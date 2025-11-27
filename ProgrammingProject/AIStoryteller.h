@@ -2,8 +2,10 @@
 #define AISTORYTELLER_H
 
 #include <string>
+#include <vector>
 
 class Player;
+class Location;
 
 class AIStoryteller {
 private:
@@ -25,6 +27,11 @@ private:
 	int movesSinceLastEvent;
 	int eventCooldown;
 	
+	// Clue tracking (ensure all clues spawn)
+	std::vector<int> spawnedClueIDs;
+	std::vector<int> availableClueIDs;
+	int clueSpawnCooldown;
+	
 	AIStoryteller();
 	
 	void calculateTension();
@@ -37,6 +44,23 @@ public:
 	// Update storyteller state based on criteria
 	void update(Player* player, int moves);
 	void incrementTime(int seconds);
+	void initializeClues(const std::vector<int>& allClueIDs);
+	
+	// NEW: Spawn decision methods (replace hardcoded percentages)
+	bool shouldSpawnZombie();
+	bool shouldSpawnLoot();
+	bool shouldSpawnClue();
+	
+	// NEW: Zombie difficulty scaling
+	int getZombieWaveCount();  // More waves when high HP
+	std::string getZombieType();  // Tougher zombies when high HP
+	
+	// NEW: Random loot generation
+	std::string generateRandomLoot();  // Returns item type
+	int getLootQuantity();
+	
+	// NEW: Random clue generation
+	int generateRandomClue();  // Returns clue ID, -1 if none
 	
 	// ASPECT 1: Zombie spawn influence
 	int adjustZombieCount(int baseCount);

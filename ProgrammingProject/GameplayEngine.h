@@ -147,6 +147,10 @@ public:
 	void displayTravelOptions();
 	bool travelToLocation(const std::string& locationID);
 
+	// AI Storyteller integration
+	void spawnAILoot(const std::string& lootType, int quantity, Direction direction);
+	void spawnAIClue(int clueID);
+
 	// ========================================================================
 	// COMBAT SYSTEM
 	// ========================================================================

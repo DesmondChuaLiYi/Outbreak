@@ -934,9 +934,21 @@ bool GameEngine::saveGame(Player* player, int slotNumber) {
 		}
 
 		// Save collected clues
-		file << journal->getCollectedClueCount() << "\n";
+		int collectedCount = journal->getCollectedClueCount();
+		file << collectedCount << "\n";
+		std::cout << "[SAVE DEBUG] Saving " << collectedCount << " collected clues\n";
 		for (int clueID : journal->getCollectedClueIDs()) {
 			file << clueID << "\n";
+			std::cout << "[SAVE DEBUG] Saved clue ID: " << clueID << "\n";
+		}
+
+		// Save unlocked skills
+		std::vector<std::string> skillIDs;
+		std::vector<int> skillLevels;
+		player->getSkillTree().getUnlockedSkillData(skillIDs, skillLevels);
+		file << skillIDs.size() << "\n";
+		for (size_t i = 0; i < skillIDs.size(); i++) {
+			file << skillIDs[i] << "|" << skillLevels[i] << "\n";
 		}
 
 		file.close();
@@ -1048,6 +1060,25 @@ Player* GameEngine::loadGame(int slotNumber) {
 			collectedClueIDs.push_back(clueID);
 		}
 
+		// Load unlocked skills
+		int unlockedSkillCount;
+		file >> unlockedSkillCount;
+		file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+		std::vector<std::string> skillIDs;
+		std::vector<int> skillLevels;
+		for (int i = 0; i < unlockedSkillCount; i++) {
+			std::string line;
+			std::getline(file, line);
+			size_t pipePos = line.find('|');
+			if (pipePos != std::string::npos) {
+				std::string skillID = line.substr(0, pipePos);
+				int level = std::stoi(line.substr(pipePos + 1));
+				skillIDs.push_back(skillID);
+				skillLevels.push_back(level);
+			}
+		}
+
 		file.close();
 
 		// Set location
@@ -1072,6 +1103,10 @@ Player* GameEngine::loadGame(int slotNumber) {
 
 		// Store collected clue IDs to restore AFTER initialize (in handleLoadGame)
 		savedCollectedClueIDs = collectedClueIDs;
+
+		// Store skill data to restore AFTER player is set up (in handleLoadGame)
+		savedSkillIDs = skillIDs;
+		savedSkillLevels = skillLevels;
 
 		return player;
 	}
@@ -1221,8 +1256,22 @@ void GameEngine::handleLoadGame() {
 
 			// CRITICAL: Restore collected clues BEFORE initialize is called!
 			// initialize() will call populateLocationClues() which checks the journal
+			std::cout << "[LOAD DEBUG] Restoring " << savedCollectedClueIDs.size() << " collected clues\n";
+			for (int clueID : savedCollectedClueIDs) {
+				std::cout << "[LOAD DEBUG] Restoring clue ID: " << clueID << "\n";
+			}
 			journal->setCollectedClueIDs(savedCollectedClueIDs);
+			std::cout << "[LOAD DEBUG] After restoration, journal has " << journal->getCollectedClueCount() << " clues\n";
 			savedCollectedClueIDs.clear();  // Clear temporary storage
+
+			// CRITICAL: Restore skill unlocks BEFORE initialize
+			// This ensures bonuses are applied correctly
+			if (!savedSkillIDs.empty()) {
+				player->getSkillTree().restoreUnlockedSkills(savedSkillIDs, savedSkillLevels);
+				player->applySkillBonuses();  // Apply stat bonuses from restored skills
+				savedSkillIDs.clear();
+				savedSkillLevels.clear();
+			}
 
 			// Now initialize (this will populate loot/clues and mark them correctly)
 			gameplay->initialize(player, getCurrentLocation(), getJournal());
