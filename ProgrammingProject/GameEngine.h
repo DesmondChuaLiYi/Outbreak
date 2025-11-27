@@ -44,7 +44,7 @@ private:
 public:
 	// Console dimensions - SINGLE SOURCE OF TRUTH
 	static const int CONSOLE_WIDTH = 120;
-	static const int CONSOLE_HEIGHT = 150;
+	static const int CONSOLE_HEIGHT = 300;
 
 	// Delete copy constructor and assignment operator
 	GameEngine(const GameEngine&) = delete;

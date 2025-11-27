@@ -73,4 +73,7 @@ void Spitter::displayInformation() {
 	std::cout << "Has Spit: " << (fHasSpit ? "Yes" : "No") << "\n";
 	std::cout << "Spat Cooldown: " << fSpatCooldown << "\n";
 	std::cout << "Acid Pool Duration: " << fAcidPoolDuration << "\n";
+	if (isEnraged()) {
+		std::cout << "STATUS: [ENRAGED]\n";
+	}
 }

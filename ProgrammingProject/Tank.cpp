@@ -114,5 +114,7 @@ void Tank::displayInformation() {
 	std::cout << "Pound Cooldown: " << fPoundCooldown << "\n";
 	std::cout << "Rock Throw Cooldown: " << fRockThrowCooldown << "\n";
 	std::cout << "Can Throw Rock: " << fCanThrowRock << "\n";
-	std::cout << "Enraged: " << (fIsEnragedState ? "Yes" : "No") << "\n";
+	if (isEnraged()) {
+		std::cout << "STATUS: [ENRAGED] (Damage x1.5)\n";
+	}
 }

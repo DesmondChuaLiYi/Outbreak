@@ -102,7 +102,6 @@ void GameplayEngine::setCurrentLocation(Location* location) {
 		// ALWAYS repopulate - this is critical!
 		populateLocationLoot();
 		populateLocationClues();
-		AudioEngine::getInstance()->playLocationMusic(location->getID());
 
 		// Set max waves based on location's hazard
 		if (location->getHazardDamage() > 5) {
@@ -376,30 +375,71 @@ void GameplayEngine::populateLocationClues() {
 	
 	std::string locID = currentLocation->getID();
 
+	// Ruined City clues (1-5)
 	if (locID == "loc_ruined_city") {
 		currentLocationClues.push_back(ClueLocation(1, "City Engineer's Journal", Direction::RIGHT));
 		currentLocationClues.push_back(ClueLocation(2, "Graffiti: THE WATER KILLED US", Direction::DOWN));
+		currentLocationClues.push_back(ClueLocation(3, "Apartment Scrawled Note", Direction::LEFT));
+		currentLocationClues.push_back(ClueLocation(4, "Grocery Store Ledger", Direction::UP));
+		currentLocationClues.push_back(ClueLocation(5, "Crowbar Engraving", Direction::RIGHT));
 	}
+	// Industrial District clues (6-10)
 	else if (locID == "loc_industrial") {
 		currentLocationClues.push_back(ClueLocation(6, "Industrial Memo", Direction::LEFT));
+		currentLocationClues.push_back(ClueLocation(7, "Toxic Drum Label", Direction::DOWN));
 		currentLocationClues.push_back(ClueLocation(8, "Warehouse Blueprint", Direction::UP));
+		currentLocationClues.push_back(ClueLocation(9, "Smoker Observation Log", Direction::RIGHT));
+		currentLocationClues.push_back(ClueLocation(10, "Boomer Corpse Notes", Direction::LEFT));
 	}
+	// Hollow Woods clues (11-15 + 52)
 	else if (locID == "loc_hollow_woods") {
 		currentLocationClues.push_back(ClueLocation(11, "Hiker's Journal", Direction::UP));
 		currentLocationClues.push_back(ClueLocation(12, "Hidden Campsite Ledger", Direction::LEFT));
+		currentLocationClues.push_back(ClueLocation(13, "Tree Carving", Direction::RIGHT));
+		currentLocationClues.push_back(ClueLocation(14, "Survivor Corpse Letter", Direction::DOWN));
+		currentLocationClues.push_back(ClueLocation(15, "Hunting Rifle Notes", Direction::UP));
+		currentLocationClues.push_back(ClueLocation(52, "Smoker Snare Notes", Direction::DOWN));
 	}
+	// Old Mill clues (16-19)
 	else if (locID == "loc_old_mill") {
 		currentLocationClues.push_back(ClueLocation(16, "The Butcher's Family Photo", Direction::UP));
+		currentLocationClues.push_back(ClueLocation(17, "Mill Floor Graffiti", Direction::DOWN));
+		currentLocationClues.push_back(ClueLocation(18, "Cleaver Scrap Notes", Direction::LEFT));
+		currentLocationClues.push_back(ClueLocation(19, "Mercy-Kill Choice Prompt", Direction::RIGHT));
 	}
+	// Overgrown Cemetery clues (20-22)
 	else if (locID == "loc_cemetery") {
 		currentLocationClues.push_back(ClueLocation(20, "Gravedigger's Diary", Direction::LEFT));
-		currentLocationClues.push_back(ClueLocation(22, "Cemetery Gate Key", Direction::DOWN));
+		currentLocationClues.push_back(ClueLocation(21, "Tombstone Messages", Direction::DOWN));
+		currentLocationClues.push_back(ClueLocation(22, "Cemetery Gate Key", Direction::UP));
 	}
+	// Polluted Canal clues (23-25)
 	else if (locID == "loc_canal") {
-		currentLocationClues.push_back(ClueLocation(25, "Government Containment Report", Direction::RIGHT));
+		currentLocationClues.push_back(ClueLocation(23, "Gas Mask Filter Notes", Direction::RIGHT));
+		currentLocationClues.push_back(ClueLocation(24, "Contaminated Water Journal", Direction::UP));
+		currentLocationClues.push_back(ClueLocation(25, "Government Containment Report", Direction::LEFT));
 	}
+	// Pump Station clues (26-29)
 	else if (locID == "loc_pump_station") {
 		currentLocationClues.push_back(ClueLocation(26, "Tony's Workstation Note", Direction::UP));
+		currentLocationClues.push_back(ClueLocation(27, "Hazmat Suit Remnants", Direction::DOWN));
+		currentLocationClues.push_back(ClueLocation(28, "Emergency Cache List", Direction::LEFT));
+		currentLocationClues.push_back(ClueLocation(29, "Survivor Message on Control Panel", Direction::RIGHT));
+		currentLocationClues.push_back(ClueLocation(52, "Smoker Snare Notes", Direction::DOWN));
+	}
+	// Suburban Wasteland clues (30-32)
+	else if (locID == "loc_suburban") {
+		currentLocationClues.push_back(ClueLocation(30, "Parent's Diary", Direction::LEFT));
+		currentLocationClues.push_back(ClueLocation(31, "Toy Soldier Collection", Direction::UP));
+		currentLocationClues.push_back(ClueLocation(32, "Locked Basement Note", Direction::DOWN));
+	}
+	// Abandoned Hospital clues (42-46)
+	else if (locID == "loc_hospital") {
+		currentLocationClues.push_back(ClueLocation(42, "Patient Zero Observation Report", Direction::UP));
+		currentLocationClues.push_back(ClueLocation(43, "Doctor's Audio Recording", Direction::LEFT));
+		currentLocationClues.push_back(ClueLocation(44, "Surgery Kit Label", Direction::RIGHT));
+		currentLocationClues.push_back(ClueLocation(45, "Hospital Gurney Notes", Direction::DOWN));
+		currentLocationClues.push_back(ClueLocation(46, "Military Orders", Direction::UP));
 	}
 	
 	// CRITICAL FIX: Mark clues as collected if they're in the journal's collected list
@@ -472,6 +512,33 @@ void GameplayEngine::moveInDirection(Direction direction) {
 			int newHP = currentPlayer->getHealth() + healAmount;
 			if (newHP > currentPlayer->getMaxHealth()) newHP = currentPlayer->getMaxHealth();
 			currentPlayer->setHealth(newHP);
+		}
+		else if (event == "STORY_CLUE") {
+			// NEW: Display random uncollected clue from current location
+			std::vector<int> uncollectedClueIDs;
+			for (const auto& clue : currentLocationClues) {
+				if (!clue.collected) {
+					uncollectedClueIDs.push_back(clue.clueID);
+				}
+			}
+			
+			if (!uncollectedClueIDs.empty()) {
+				int randomClueID = uncollectedClueIDs[rand() % uncollectedClueIDs.size()];
+				Clue* discoveredClue = journal->getClue(randomClueID);
+				
+				if (discoveredClue != nullptr) {
+					system("cls");
+					std::cout << "\n" << std::string(80, '=') << "\n";
+					std::cout << "  [DISCOVERED LORE] " << discoveredClue->getClueName() << "\n";
+					std::cout << std::string(80, '=') << "\n\n";
+					std::cout << "  \"" << discoveredClue->getContent() << "\"\n\n";
+					std::cout << "  Location: " << discoveredClue->getLocationFound() << "\n";
+					std::cout << "  Effect: " << discoveredClue->getEffect() << "\n";
+					std::cout << "\n" << std::string(80, '=') << "\n";
+					std::cout << "  Press ENTER...";
+					std::cin.get();
+				}
+			}
 		}
 	}
 	
@@ -740,6 +807,7 @@ CombatResult GameplayEngine::conductCombat() {
 
 
 
+
 		if (currentZombie == nullptr || currentZombie->getHealth() <= 0) {
 			if (currentZombie != nullptr) {
 				std::cout << "  [KILL] " << currentZombie->getType() << " defeated!\n";
@@ -819,7 +887,7 @@ CombatResult GameplayEngine::conductCombat() {
 
 				// Store in array (shift older actions down)
 				if (actionCount < MAX_COMBAT_HISTORY) {
-					actions[actionCount++] = action;
+				actions[actionCount++] = action;
 				} else {
 					// Shift all actions down and add new one at end
 					for (int i = 0; i < MAX_COMBAT_HISTORY - 1; i++) {

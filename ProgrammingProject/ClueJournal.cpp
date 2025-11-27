@@ -36,6 +36,10 @@ std::string Clue::getLocationFound() const {
 	return fLocationFound;
 }
 
+std::string Clue::getEffect() const {
+	return fPlayerEffect;
+}
+
 bool Clue::isCollected() const {
 	return fCollected;
 }
@@ -334,7 +338,21 @@ std::vector<int> ClueJournal::getCollectedClueIDs() const {
 
 // Restore collected clues from saved IDs
 void ClueJournal::setCollectedClueIDs(const std::vector<int>& clueIDs) {
+	// CRITICAL FIX: Mark clues as collected in both lists and increment counter
 	for (int clueID : clueIDs) {
-		collectClue(clueID);
+		// Find in all clues and mark as collected
+		DoublyLinkedList<Clue>::Iterator it = fAllClues.begin();
+		while (it != fAllClues.end()) {
+			if ((*it).getClueID() == clueID) {
+				// Mark as collected in fAllClues
+				(*it).setCollected(true);
+				
+				// Add to fCollectedClues
+				fCollectedClues.pushBack(*it);
+				fCluesCollected++;
+				break;
+			}
+			++it;
+		}
 	}
 }

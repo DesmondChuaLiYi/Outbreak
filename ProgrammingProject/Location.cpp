@@ -1,4 +1,5 @@
 #include "Location.h"
+#include "AudioEngine.h"
 #include <iostream>
 
 // Default constructor
@@ -336,6 +337,12 @@ std::string Location::getChapterStory() const {
 void Location::displayChapterIntro() const {
 	if (fChapterNumber == 0) {
 		return; // No chapter assigned
+	}
+
+	// Play location music when displaying chapter intro
+	AudioEngine* audio = AudioEngine::getInstance();
+	if (audio) {
+		audio->playLocationMusic(fID);
 	}
 
 	std::cout << "\n";

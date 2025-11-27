@@ -65,4 +65,7 @@ void Smoker::displayInformation() {
 	std::cout << "Health: " << fHealth << "/" << fMaxHealth << ", Damage: " << fDamage << ", Speed: " << fSpeed << "\n";
 	std::cout << "Tongue Attack Damage: " << TONGUE_DAMAGE << ", Tongue Range: " << fTongueRange << "\n";
 	std::cout << "Has Used Tongue: " << (fHasUsedTongue ? "Yes" : "No") << ", Tongue Cooldown: " << fTongueCooldown << "\n";
+	if (isEnraged()) {
+		std::cout << "STATUS: [ENRAGED]\n";
+	}
 }

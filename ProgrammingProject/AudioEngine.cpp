@@ -76,7 +76,10 @@ AudioEngine::AudioEngine()
 		return;
 	}
 
+	// Commented out audio initialization debug message
+	/*
 	std::cout << "[AUDIO] DirectSound initialized successfully\n";
+	*/
 	// Note: Music will be started by main.cpp when showing title screen
 }
 
@@ -178,11 +181,12 @@ HRESULT AudioEngine::loadWaveFile(const std::string& filePath, LPDIRECTSOUNDBUFF
 		return E_FAIL;
 	}
 
-	// Read RIFF header
+	// Reuse local variables for RIFF header
 	char riffHeader[4];
 	DWORD fileSize;
 	char waveHeader[4];
 
+	// Read RIFF header
 	file.read(riffHeader, 4);
 	file.read(reinterpret_cast<char*>(&fileSize), 4);
 	file.read(waveHeader, 4);
@@ -237,8 +241,10 @@ HRESULT AudioEngine::loadWaveFile(const std::string& filePath, LPDIRECTSOUNDBUFF
 
 			fmtFound = true;
 
+			/*
 			std::cout << "[AUDIO DEBUG] WAV Format: " << numChannels << " channels, "
 			          << sampleRate << " Hz, " << bitsPerSample << " bits\n";
+			*/
 		} else {
 			// Skip unknown chunk
 			file.seekg(chunkSize, std::ios::cur);
@@ -265,7 +271,7 @@ HRESULT AudioEngine::loadWaveFile(const std::string& filePath, LPDIRECTSOUNDBUFF
 		if (strncmp(chunkID, "data", 4) == 0) {
 			dataSize = chunkSize;
 			dataFound = true;
-			std::cout << "[AUDIO DEBUG] Data chunk size: " << dataSize << " bytes\n";
+			// std::cout << "[AUDIO DEBUG] Data chunk size: " << dataSize << " bytes\n";
 		} else {
 			// Skip unknown chunk
 			file.seekg(chunkSize, std::ios::cur);
@@ -317,7 +323,7 @@ HRESULT AudioEngine::loadWaveFile(const std::string& filePath, LPDIRECTSOUNDBUFF
 	(*ppBuffer)->Unlock(pBuffer1, dwBuffer1Size, pBuffer2, dwBuffer2Size);
 	file.close();
 
-	std::cout << "[AUDIO DEBUG] Successfully loaded WAV file: " << filePath << "\n";
+	// std::cout << "[AUDIO DEBUG] Successfully loaded WAV file: " << filePath << "\n";
 	return S_OK;
 }
 
@@ -353,10 +359,13 @@ bool AudioEngine::playBackgroundMusic(const std::string& musicFilePath) {
 		return false;
 	}
 
+	// Set music volume to 50% (-3000 on the -10000 to 0 scale)
+	pMusicBuffer->SetVolume(-3000);
+
 	usingMCI = false;
 	isMusicPlaying = true;
 	currentMusicTrack = musicFilePath;
-	std::cout << "[AUDIO] Now playing: " << musicFilePath << " (DirectSound)\n";
+	// std::cout << "[AUDIO] Now playing: " << musicFilePath << " (DirectSound, 50% volume)\n";
 	return true;
 }
 
@@ -369,7 +378,7 @@ bool AudioEngine::stopBackgroundMusic() {
 		isMusicPlaying = false;
 		usingMCI = false;
 		currentMusicTrack = "";
-		std::cout << "[AUDIO] Background music stopped (MCI)\n";
+		// std::cout << "[AUDIO] Background music stopped (MCI)\n";
 		return true;
 	}
 	else if (pMusicBuffer) {
@@ -378,7 +387,7 @@ bool AudioEngine::stopBackgroundMusic() {
 		releaseBuffer(&pMusicBuffer);
 		isMusicPlaying = false;
 		currentMusicTrack = "";
-		std::cout << "[AUDIO] Background music stopped (DirectSound)\n";
+		// std::cout << "[AUDIO] Background music stopped (DirectSound)\n";
 		return true;
 	}
 	return false;
@@ -388,12 +397,12 @@ bool AudioEngine::stopBackgroundMusic() {
 bool AudioEngine::pauseBackgroundMusic() {
 	if (usingMCI && isMusicPlaying) {
 		mciSendStringA("pause MediaFile", nullptr, 0, nullptr);
-		std::cout << "[AUDIO] Background music paused (MCI)\n";
+		// std::cout << "[AUDIO] Background music paused (MCI)\n";
 		return true;
 	}
 	else if (pMusicBuffer && isMusicPlaying) {
 		pMusicBuffer->Stop();
-		std::cout << "[AUDIO] Background music paused (DirectSound)\n";
+		// std::cout << "[AUDIO] Background music paused (DirectSound)\n";
 		return true;
 	}
 	return false;
@@ -403,13 +412,13 @@ bool AudioEngine::pauseBackgroundMusic() {
 bool AudioEngine::resumeBackgroundMusic() {
 	if (usingMCI) {
 		mciSendStringA("resume MediaFile", nullptr, 0, nullptr);
-		std::cout << "[AUDIO] Background music resumed (MCI)\n";
+		// std::cout << "[AUDIO] Background music resumed (MCI)\n";
 		return true;
 	}
 	else if (pMusicBuffer) {
 		HRESULT hr = pMusicBuffer->Play(0, 0, DSBPLAY_LOOPING);
 		if (SUCCEEDED(hr)) {
-			std::cout << "[AUDIO] Background music resumed (DirectSound)\n";
+			// std::cout << "[AUDIO] Background music resumed (DirectSound)\n";
 			return true;
 		}
 	}
@@ -460,6 +469,7 @@ void AudioEngine::playMenuSelectSound() {
 		}
 	}
 	pMenuSelectBuffer->SetCurrentPosition(0);
+	pMenuSelectBuffer->SetVolume(-2000);  
 	pMenuSelectBuffer->Play(0, 0, 0);
 }
 
@@ -470,6 +480,7 @@ void AudioEngine::playMenuNavigateSound() {
 		}
 	}
 	pMenuNavigateBuffer->SetCurrentPosition(0);
+	pMenuNavigateBuffer->SetVolume(-2000);  
 	pMenuNavigateBuffer->Play(0, 0, 0);
 }
 
@@ -480,6 +491,7 @@ void AudioEngine::playCombatAttackSound() {
 		}
 	}
 	pCombatAttackBuffer->SetCurrentPosition(0);
+	pCombatAttackBuffer->SetVolume(-2000);  
 	pCombatAttackBuffer->Play(0, 0, 0);
 }
 
@@ -490,6 +502,7 @@ void AudioEngine::playCombatHitSound() {
 		}
 	}
 	pCombatHitBuffer->SetCurrentPosition(0);
+	pCombatHitBuffer->SetVolume(-2000);  
 	pCombatHitBuffer->Play(0, 0, 0);
 }
 
@@ -500,6 +513,7 @@ void AudioEngine::playCombatMissSound() {
 		}
 	}
 	pCombatMissBuffer->SetCurrentPosition(0);
+	pCombatMissBuffer->SetVolume(-2000);  
 	pCombatMissBuffer->Play(0, 0, 0);
 }
 
@@ -510,6 +524,7 @@ void AudioEngine::playLootPickupSound() {
 		}
 	}
 	pLootPickupBuffer->SetCurrentPosition(0);
+	pLootPickupBuffer->SetVolume(-2000);  
 	pLootPickupBuffer->Play(0, 0, 0);
 }
 
@@ -520,6 +535,7 @@ void AudioEngine::playZombieDeathSound() {
 		}
 	}
 	pZombieDeathBuffer->SetCurrentPosition(0);
+	pZombieDeathBuffer->SetVolume(-2000);  
 	pZombieDeathBuffer->Play(0, 0, 0);
 }
 
@@ -530,6 +546,7 @@ void AudioEngine::playEnvironmentalHazardSound() {
 		}
 	}
 	pEnvironmentalHazardBuffer->SetCurrentPosition(0);
+	pEnvironmentalHazardBuffer->SetVolume(-2000);  
 	pEnvironmentalHazardBuffer->Play(0, 0, 0);
 }
 
@@ -540,6 +557,7 @@ void AudioEngine::playLevelUpSound() {
 		}
 	}
 	pLevelUpBuffer->SetCurrentPosition(0);
+	pLevelUpBuffer->SetVolume(-2000);  
 	pLevelUpBuffer->Play(0, 0, 0);
 }
 
@@ -550,6 +568,7 @@ void AudioEngine::playSkillUnlockSound() {
 		}
 	}
 	pSkillUnlockBuffer->SetCurrentPosition(0);
+	pSkillUnlockBuffer->SetVolume(-2000);  
 	pSkillUnlockBuffer->Play(0, 0, 0);
 }
 
@@ -560,6 +579,7 @@ void AudioEngine::playSaveGameSound() {
 		}
 	}
 	pSaveGameBuffer->SetCurrentPosition(0);
+	pSaveGameBuffer->SetVolume(-2000);  
 	pSaveGameBuffer->Play(0, 0, 0);
 }
 
@@ -570,60 +590,56 @@ void AudioEngine::playSaveGameSound() {
 bool AudioEngine::playLocationMusic(const std::string& locationID) {
 	// Don't switch if in combat music
 	if (inCombatMusic) {
-		std::cout << "[AUDIO] Combat music playing - location music will resume after combat\n";
+		//std::cout << "[AUDIO] Combat music playing - location music will resume after combat\n";
 		return false;
 	}
 
 	std::string musicPath;
 
-	// Map location IDs to music files
-	if (locationID == "loc_ruined_city" || locationID == "ruined_city" || locationID == "Ruined City") {
+	// Map location IDs to music files (10 locations with 10 unique soundtracks)
+	if (locationID == "loc_ruined_city") {
 		musicPath = "Audio\\Music\\ruined_city.wav";
-		std::cout << "[AUDIO] Switching to Ruined City music\n";
+		// std::cout << "[AUDIO] Switching to Ruined City music\n";
 	}
-	else if (locationID == "industrial" || locationID == "Industrial") {
-		musicPath = "Audio\\Music\\industrial.wav";
-		std::cout << "[AUDIO] Switching to Industrial music\n";
+	else if (locationID == "loc_industrial") {
+		musicPath = "Audio\\Music\\industrial_district.wav";
+		// std::cout << "[AUDIO] Switching to Industrial District music\n";
 	}
-	else if (locationID == "hollow_woods" || locationID == "Hollow Woods") {
+	else if (locationID == "loc_hollow_woods") {
 		musicPath = "Audio\\Music\\hollow_woods.wav";
-		std::cout << "[AUDIO] Switching to Hollow Woods music\n";
+		// std::cout << "[AUDIO] Switching to Hollow Woods music\n";
 	}
-	else if (locationID == "cemetery" || locationID == "Cemetery") {
-		musicPath = "Audio\\Music\\cemetery.wav";
-		std::cout << "[AUDIO] Switching to Cemetery music\n";
-	}
-	else if (locationID == "old_mill" || locationID == "Old Mill") {
+	else if (locationID == "loc_old_mill") {
 		musicPath = "Audio\\Music\\old_mill.wav";
-		std::cout << "[AUDIO] Switching to Old Mill music\n";
+		// std::cout << "[AUDIO] Switching to Old Mill music\n";
 	}
-	else if (locationID == "canal" || locationID == "Canal") {
-		musicPath = "Audio\\Music\\canal.wav";
-		std::cout << "[AUDIO] Switching to Canal music\n";
+	else if (locationID == "loc_cemetery") {
+		musicPath = "Audio\\Music\\cemetery.wav";
+		// std::cout << "[AUDIO] Switching to Cemetery music\n";
 	}
-	else if (locationID == "pump_station" || locationID == "Pump Station") {
+	else if (locationID == "loc_canal") {
+		musicPath = "Audio\\Music\\polluted_canal.wav";
+		// std::cout << "[AUDIO] Switching to Polluted Canal music\n";
+	}
+	else if (locationID == "loc_pump_station") {
 		musicPath = "Audio\\Music\\pump_station.wav";
-		std::cout << "[AUDIO] Switching to Pump Station music\n";
+		// std::cout << "[AUDIO] Switching to Pump Station music\n";
 	}
-	else if (locationID == "hospital" || locationID == "Hospital") {
+	else if (locationID == "loc_suburban") {
+		musicPath = "Audio\\Music\\suburban_wasteland.wav";
+		// std::cout << "[AUDIO] Switching to Suburban Wasteland music\n";
+	}
+	else if (locationID == "loc_hospital") {
 		musicPath = "Audio\\Music\\hospital.wav";
-		std::cout << "[AUDIO] Switching to Hospital music\n";
+		// std::cout << "[AUDIO] Switching to Hospital music\n";
 	}
-	else if (locationID == "police_station" || locationID == "Police Station") {
-		musicPath = "Audio\\Music\\police_station.wav";
-		std::cout << "[AUDIO] Switching to Police Station music\n";
-	}
-	else if (locationID == "shopping_mall" || locationID == "Shopping Mall") {
-		musicPath = "Audio\\Music\\shopping_mall.wav";
-		std::cout << "[AUDIO] Switching to Shopping Mall music\n";
-	}
-	else if (locationID == "subway" || locationID == "Subway") {
-		musicPath = "Audio\\Music\\subway.wav";
-		std::cout << "[AUDIO] Switching to Subway music\n";
+	else if (locationID == "loc_sanctuary") {
+		musicPath = "Audio\\Music\\sanctuary.wav";
+		// std::cout << "[AUDIO] Switching to Sanctuary music\n";
 	}
 	else {
 		// Default/unknown location - no music or use generic exploration music
-		std::cout << "[AUDIO] No specific music for location: " << locationID << "\n";
+		// std::cout << "[AUDIO] No specific music for location: " << locationID << "\n";
 		return false;
 	}
 
@@ -632,7 +648,7 @@ bool AudioEngine::playLocationMusic(const std::string& locationID) {
 }
 
 bool AudioEngine::stopAllMusic() {
-	std::cout << "[AUDIO] Stopping all music (returning to title screen)\n";
+	// std::cout << "[AUDIO] Stopping all music (returning to title screen)\n";
 	pausedMusicTrack = "";
 	inCombatMusic = false;
 	return stopBackgroundMusic();
@@ -649,7 +665,7 @@ bool AudioEngine::playCombatMusic() {
 
 	// Save current track to resume later
 	pausedMusicTrack = currentMusicTrack;
-	std::cout << "[AUDIO] Pausing location music: " << pausedMusicTrack << "\n";
+	// std::cout << "[AUDIO] Pausing location music: " << pausedMusicTrack << "\n";
 
 	// Stop current music
 	stopBackgroundMusic();
@@ -659,7 +675,7 @@ bool AudioEngine::playCombatMusic() {
 	bool result = playBackgroundMusic("Audio\\Music\\combat_music.wav");
 	
 	if (result) {
-		std::cout << "[AUDIO] Combat music started!\n";
+		// std::cout << "[AUDIO] Combat music started!\n";
 	}
 	
 	return result;
@@ -670,7 +686,7 @@ bool AudioEngine::stopCombatMusic() {
 		return true;  // Not in combat music
 	}
 
-	std::cout << "[AUDIO] Combat ended - resuming location music\n";
+	// std::cout << "[AUDIO] Combat ended - resuming location music\n";
 
 	// Stop combat music
 	stopBackgroundMusic();
@@ -678,7 +694,7 @@ bool AudioEngine::stopCombatMusic() {
 
 	// Resume paused music if any
 	if (!pausedMusicTrack.empty()) {
-		std::cout << "[AUDIO] Resuming: " << pausedMusicTrack << "\n";
+		// std::cout << "[AUDIO] Resuming: " << pausedMusicTrack << "\n";
 		bool result = playBackgroundMusic(pausedMusicTrack);
 		pausedMusicTrack = "";
 		return result;

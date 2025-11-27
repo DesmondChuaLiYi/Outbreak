@@ -936,10 +936,10 @@ bool GameEngine::saveGame(Player* player, int slotNumber) {
 		// Save collected clues
 		int collectedCount = journal->getCollectedClueCount();
 		file << collectedCount << "\n";
-		std::cout << "[SAVE DEBUG] Saving " << collectedCount << " collected clues\n";
+		// std::cout << "[SAVE DEBUG] Saving " << collectedCount << " collected clues\n";
 		for (int clueID : journal->getCollectedClueIDs()) {
 			file << clueID << "\n";
-			std::cout << "[SAVE DEBUG] Saved clue ID: " << clueID << "\n";
+			// std::cout << "[SAVE DEBUG] Saved clue ID: " << clueID << "\n";
 		}
 
 		// Save unlocked skills
@@ -1007,7 +1007,7 @@ Player* GameEngine::loadGame(int slotNumber) {
 			std::string line;
 			std::getline(file, line);
 
-			// Parse item data (pipe-delimited)
+			// Parse item data (pipe-delited)
 			size_t pos = 0;
 			std::vector<std::string> tokens;
 			while ((pos = line.find('|')) != std::string::npos) {
@@ -1256,12 +1256,12 @@ void GameEngine::handleLoadGame() {
 
 			// CRITICAL: Restore collected clues BEFORE initialize is called!
 			// initialize() will call populateLocationClues() which checks the journal
-			std::cout << "[LOAD DEBUG] Restoring " << savedCollectedClueIDs.size() << " collected clues\n";
+			// std::cout << "[LOAD DEBUG] Restoring " << savedCollectedClueIDs.size() << " collected clues\n";
 			for (int clueID : savedCollectedClueIDs) {
-				std::cout << "[LOAD DEBUG] Restoring clue ID: " << clueID << "\n";
+				// std::cout << "[LOAD DEBUG] Restoring clue ID: " << clueID << "\n";
 			}
 			journal->setCollectedClueIDs(savedCollectedClueIDs);
-			std::cout << "[LOAD DEBUG] After restoration, journal has " << journal->getCollectedClueCount() << " clues\n";
+			// std::cout << "[LOAD DEBUG] After restoration, journal has " << journal->getCollectedClueCount() << " clues\n";
 			savedCollectedClueIDs.clear();  // Clear temporary storage
 
 			// CRITICAL: Restore skill unlocks BEFORE initialize
@@ -1522,6 +1522,176 @@ void GameEngine::runExplorationLoop(Player* player) {
 				exploring = false;
 			}
 		}
+		else if (command == "cheat") {
+			// CHEAT MENU - Developer Tools (Hidden Command)
+			bool inCheatMenu = true;
+			while (inCheatMenu) {
+				system("cls");
+				std::cout << "\n" << std::string(80, '=') << "\n";
+				std::cout << "  [DEV TOOLS] CHEAT MENU\n";
+				std::cout << std::string(80, '=') << "\n\n";
+				std::cout << "  Available Commands:\n\n";
+				std::cout << "  spawn <zombie_type>  - Spawn a zombie (boomer, spitter, smoker, tank, common)\n";
+				std::cout << "  tp <location>        - Teleport to location (e.g., 'tp industrial district')\n";
+				std::cout << "  ending <type>     - Trigger ending (good, bad, normal, perfectionist)\n";
+				std::cout << "  heal      - Restore full health\n";
+				std::cout << "  addxp <amount> - Add experience points\n";
+				std::cout << "  addsp <amount>       - Add skill points\n";
+				std::cout << "  back - Return to game\n\n";
+				std::cout << "  > ";
+
+
+
+				std::string cheatCmd;
+				std::getline(std::cin, cheatCmd);
+				
+				// Convert to lowercase for case-insensitive matching
+				for (char& c : cheatCmd) c = tolower(c);
+
+				// Parse cheat commands
+				if (cheatCmd.find("spawn ") == 0) {
+					std::string zombieType = cheatCmd.substr(6);
+					Zombie* newZombie = nullptr;
+					
+					if (zombieType == "boomer") {
+						newZombie = new Boomer("cheat_boomer", "Boomer");
+					}
+					else if (zombieType == "spitter") {
+						newZombie = new Spitter("cheat_spitter", "Spitter");
+					}
+					else if (zombieType == "smoker") {
+						newZombie = new Smoker("cheat_smoker", "Smoker");
+					}
+					else if (zombieType == "tank") {
+						newZombie = new Tank("cheat_tank", "Tank");
+					}
+					else if (zombieType == "common") {
+						newZombie = new CommonInfected("cheat_common", "Common Infected");
+					}
+					
+					if (newZombie) {
+						gameplay->getCurrentLocation()->addZombie(newZombie);
+						std::cout << "\n  [SPAWN] " << zombieType << " spawned at current location!\n";
+						std::cout << "  Press ENTER to begin combat...";
+						std::cin.get();
+						
+						// IMMEDIATELY START COMBAT with spawned zombie
+						inCheatMenu = false;
+						gameplay->startCombat();
+					}
+					else {
+						std::cout << "\n  [ERROR] Unknown zombie type: " << zombieType << "\n";
+						std::cout << "  Press ENTER...";
+						std::cin.get();
+					}
+				}
+				else if (cheatCmd.find("tp ") == 0) {
+					std::string locationName = cheatCmd.substr(3);
+					
+					// Convert location name to location ID (case-insensitive)
+					std::string locationID = "";
+					
+					if (locationName.find("ruined city") != std::string::npos) {
+						locationID = "loc_ruined_city";
+					}
+					else if (locationName.find("industrial") != std::string::npos) {
+						locationID = "loc_industrial";
+					}
+					else if (locationName.find("hollow woods") != std::string::npos || locationName.find("woods") != std::string::npos) {
+						locationID = "loc_hollow_woods";
+					}
+					else if (locationName.find("old mill") != std::string::npos || locationName.find("mill") != std::string::npos) {
+						locationID = "loc_old_mill";
+					}
+					else if (locationName.find("cemetery") != std::string::npos) {
+						locationID = "loc_cemetery";
+					}
+					else if (locationName.find("canal") != std::string::npos) {
+						locationID = "loc_canal";
+					}
+					else if (locationName.find("pump station") != std::string::npos || locationName.find("pump") != std::string::npos) {
+						locationID = "loc_pump_station";
+					}
+					else if (locationName.find("suburban") != std::string::npos) {
+						locationID = "loc_suburban";
+					}
+					else if (locationName.find("hospital") != std::string::npos) {
+						locationID = "loc_hospital";
+					}
+					else if (locationName.find("sanctuary") != std::string::npos) {
+						locationID = "loc_sanctuary";
+					}
+					
+					if (!locationID.empty()) {
+						Location* newLoc = getLocationByID(locationID);
+						if (newLoc) {
+							setCurrentLocation(newLoc);
+							gameplay->setCurrentLocation(newLoc);
+							newLoc->markVisited();
+							newLoc->displayChapterIntro();
+							std::cout << "\n  [TP] Teleported to " << newLoc->getName() << "!\n";
+							std::cout << "  Press ENTER...";
+							std::cin.get();
+						}
+					}
+					else {
+						std::cout << "\n  [ERROR] Unknown location!\n";
+						std::cout << "  Available: ruined city, industrial, hollow woods, old mill,\n";
+						std::cout << "     cemetery, canal, pump station, suburban, hospital, sanctuary\n";
+						std::cout << "  Press ENTER...";
+						std::cin.get();
+					}
+				}
+				else if (cheatCmd.find("ending ") == 0) {
+					std::string endingType = cheatCmd.substr(7);
+					
+					std::cout << "\n  [ENDING] Triggering " << endingType << " ending...\n";
+					std::cout << "  [PLACEHOLDER] This ending has not been implemented yet.\n";
+					std::cout << "  Press ENTER...";
+					std::cin.get();
+				}
+				else if (cheatCmd == "heal") {
+					player->setHealth(player->getMaxHealth());
+					std::cout << "\n  [HEAL] Health restored to full!\n";
+					std::cout << "  Press ENTER...";
+					std::cin.get();
+				}
+				else if (cheatCmd.find("addxp ") == 0) {
+					try {
+						int amount = std::stoi(cheatCmd.substr(6));
+						player->gainExperience(amount);
+						std::cout << "\n  [XP] Added " << amount << " experience!\n";
+						std::cout << "  Press ENTER...";
+						std::cin.get();
+					} catch (...) {
+						std::cout << "\n  [ERROR] Invalid amount!\n";
+						std::cout << "  Press ENTER...";
+						std::cin.get();
+					}
+				}
+				else if (cheatCmd.find("addsp ") == 0) {
+					try {
+						int amount = std::stoi(cheatCmd.substr(6));
+						player->addSkillPoints(amount);
+						std::cout << "\n  [SP] Added " << amount << " skill points!\n";
+						std::cout << "  Press ENTER...";
+						std::cin.get();
+					} catch (...) {
+						std::cout << "\n  [ERROR] Invalid amount!\n";
+						std::cout << "  Press ENTER...";
+						std::cin.get();
+					}
+				}
+				else if (cheatCmd == "back") {
+					inCheatMenu = false;
+				}
+				else if (!cheatCmd.empty()) {
+					std::cout << "\n  [ERROR] Unknown cheat command!\n";
+					std::cout << "  Press ENTER...";
+					std::cin.get();
+				}
+			}
+		}
 		else {
 			system("cls");
 			std::cout << "\n  Unknown command.\n";
@@ -1529,7 +1699,7 @@ void GameEngine::runExplorationLoop(Player* player) {
 			if (gameplay->canTravelToNewLocation()) {
 				std::cout << " | travel";
 			}
-			std::cout << ", menu\n";
+			std::cout << " | menu | skills\n";
 			std::cout << "  Press ENTER...";
 			std::cin.get();
 		}
@@ -1547,7 +1717,6 @@ void GameEngine::runExplorationLoop(Player* player) {
 	}
 }
 
-// Display skill tree menu and allow player to upgrade skills
 void GameEngine::displaySkillTreeMenu(Player* player) {
 	bool inSkillMenu = true;
 
@@ -1555,7 +1724,7 @@ void GameEngine::displaySkillTreeMenu(Player* player) {
 		system("cls");
 		std::cout << "\n";
 		std::cout << "================================================================\n";
-		std::cout << "                        SKILL TREE                              \n";
+		std::cout << "     SKILL TREE      \n";
 		std::cout << "================================================================\n\n";
 
 		// Display available skill points
@@ -1575,13 +1744,13 @@ void GameEngine::displaySkillTreeMenu(Player* player) {
 
 		if (damageBonus > 0) std::cout << "    +" << damageBonus << " Damage\n";
 		if (healthBonus > 0) std::cout << "    +" << healthBonus << " Max Health\n";
-		if (infectionRes > 0) std::cout << "    +" << infectionRes << "% Infection Resistance\n";
+		if (infectionRes > 0) std::cout << "+" << infectionRes << "% Infection Resistance\n";
 		if (craftingBonus > 0) std::cout << "    -" << (int)(craftingBonus * 100) << "% Crafting Cost\n";
-		if (scavengeBonus > 0) std::cout << "    +" << (int)(scavengeBonus * 100) << "% Loot Quality\n";
+		if (scavengeBonus > 0) std::cout << " +" << (int)(scavengeBonus * 100) << "% Loot Quality\n";
 
 		std::cout << "\n";
 		std::cout << "================================================================\n";
-		std::cout << "                      AVAILABLE SKILLS                          \n";
+		std::cout << "       AVAILABLE SKILLS        \n";
 		std::cout << "================================================================\n\n";
 
 		// Display all skills
@@ -1621,8 +1790,8 @@ void GameEngine::displaySkillTreeMenu(Player* player) {
 						std::cout << "[LOCKED]   ";
 					}
 					std::cout << childSkill->getSkillName() << " (" << childSkill->typeToString() << ")\n";
-					std::cout << "   " << childSkill->getSkillDescription() << "\n";
-					std::cout << "     Cost: " << childSkill->getCost() << " SP | Level: " << childSkill->getLevel() << "/" << childSkill->getMaxLevel() << "\n";
+					std::cout << "      " << childSkill->getSkillDescription() << "\n";
+					std::cout << "    Cost: " << childSkill->getCost() << " SP | Level: " << childSkill->getLevel() << "/" << childSkill->getMaxLevel() << "\n";
 
 					// Store the skill ID for lookup (not name)
 					skillIDs.push_back(childSkill->getSkillID());
@@ -1712,87 +1881,7 @@ void GameEngine::displaySkillTreeMenu(Player* player) {
 						}
 					} else {
 						std::cout << "\n  Not enough skill points! Need " << selectedSkill->getCost() << ", have " << availablePoints << "\n";
-						std::cout << "  Press ENTER...";
-						std::cin.get();
-					}
-				}
-			} else {
-				std::cout << "\n  Skill not found!\n";
-				std::cout << "Press ENTER...";
-				std::cin.get();
-			}
-		} else if (choice > 0 && choice <= (int)skillIDs.size()) {
-			std::string selectedSkillID = skillIDs[choice - 1];
-			SkillNode* selectedSkill = skillTree.getSkill(selectedSkillID);
-
-			if (selectedSkill != nullptr) {
-				// Check if skill is already unlocked
-				if (selectedSkill->isUnlocked()) {
-					// Try to level up
-					if (selectedSkill->isMaxLevel()) {
-						std::cout << "\n  This skill is already at max level!\n";
-						std::cout << "  Press ENTER...";
-						std::cin.get();
-					} else {
-						availablePoints = player->getSkillPoints(); // Refresh points
-						if (availablePoints >= selectedSkill->getCost()) {
-							if (skillTree.levelUpSkill(selectedSkillID)) {
-								// Sync player skill points with SkillTree
-								int newPoints = availablePoints - selectedSkill->getCost();
-								player->setSkillPoints(newPoints);
-								
-								// Apply skill bonuses after leveling up
-								player->applySkillBonuses();
-								
-								std::cout << "\n  [SUCCESS] Skill upgraded: " << selectedSkill->getSkillName() << "\n";
-								std::cout << "  Level: " << selectedSkill->getLevel() << "/" << selectedSkill->getMaxLevel() << "\n";
-								std::cout << "  Skill Points: " << player->getSkillPoints() << "\n";
-								std::cout << "  Press ENTER...";
-								std::cin.get();
-							} else {
-								std::cout << "\n  Failed to upgrade skill!\n";
-								std::cout << "  Press ENTER...";
-								std::cin.get();
-							}
-						} else {
-							std::cout << "\n  Not enough skill points! Need " << selectedSkill->getCost() << ", have " << availablePoints << "\n";
-							std::cout << "  Press ENTER...";
-							std::cin.get();
-						}
-					}
-				} else {
-					// Try to unlock
-					availablePoints = player->getSkillPoints(); // Refresh points
-					if (availablePoints >= selectedSkill->getCost()) {
-						// Check prerequisites
-						SkillNode* parent = selectedSkill->getParent();
-						if (parent != nullptr && !parent->isUnlocked()) {
-							std::cout << "\n  You must unlock the parent skill first!\n";
-							std::cout << "  Parent: " << parent->getSkillName() << "\n";
-							std::cout << "  Press ENTER...";
-							std::cin.get();
-						} else {
-							if (skillTree.unlockSkill(selectedSkillID)) {
-								// Sync player skill points with SkillTree
-								int newPoints = availablePoints - selectedSkill->getCost();
-								player->setSkillPoints(newPoints);
-								
-								// Apply skill bonuses after unlocking
-								player->applySkillBonuses();
-								
-								std::cout << "\n  [SUCCESS] Skill unlocked: " << selectedSkill->getSkillName() << "\n";
-								std::cout << "  Skill Points: " << player->getSkillPoints() << "\n";
-								std::cout << "  Press ENTER...";
-								std::cin.get();
-							} else {
-								std::cout << "\n  Failed to unlock skill!\n";
-								std::cout << "  Press ENTER...";
-								std::cin.get();
-							}
-						}
-					} else {
-						std::cout << "\n  Not enough skill points! Need " << selectedSkill->getCost() << ", have " << availablePoints << "\n";
-						std::cout << "  Press ENTER...";
+						std::cout << "Press ENTER...";
 						std::cin.get();
 					}
 				}

@@ -68,4 +68,7 @@ void CommonInfected::displayInformation() {
 	Zombie::displayInformation();
 	std::cout << "  Can Swarm: " << (fCanSwarm ? "Yes" : "No") << "\n";
 	std::cout << "  Swarm Count: " << fSwarmCount << "\n";
+	if (isEnraged()) {
+		std::cout << "  STATUS: [ENRAGED]\n";
+	}
 }

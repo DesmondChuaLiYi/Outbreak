@@ -31,6 +31,7 @@ public:
 	virtual std::string getClueName() const;
 	virtual std::string getContent() const;
 	virtual std::string getLocationFound() const;
+	virtual std::string getEffect() const;
 	virtual bool isCollected() const;
 
 	// Setter methods

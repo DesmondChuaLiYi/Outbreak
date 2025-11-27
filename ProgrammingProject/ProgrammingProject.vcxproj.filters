@@ -84,6 +84,9 @@
     <ClCompile Include="Crafting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AIStoryteller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DoublyLinkedNode.h">
@@ -177,6 +180,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Crafting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AIStoryteller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

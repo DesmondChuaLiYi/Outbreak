@@ -73,11 +73,17 @@ void Boomer::displayInformation() {
 	std::cout << "Speed: " << fSpeed << "\n";
 	std::cout << "Has Vomited: " << (fHasVomited ? "Yes" : "No") << "\n";
 	std::cout << "Vomit Cooldown: " << fVomitCooldown << "\n";
+	if (isEnraged()) {
+		std::cout << "STATUS: [ENRAGED]\n";
+	}
 }
 
-// Phase 2: Special Ability - Explosion on Death
+// Phase 2: Special Ability - Explosion on Death and Enraged state
 void Boomer::onDeath(Player* target) {
 	if (target != nullptr) {
+		// EXPLOSION DAMAGE when Boomer dies
+		std::cout << "\n  [CRITICAL HIT] " << fName << " EXPLODES in a shower of acid!\n";
 		target->takeDamage(EXPLOSION_DAMAGE);
+		std::cout << "  [DAMAGE] You took " << EXPLOSION_DAMAGE << " damage from the explosion!\n";
 	}
 }
