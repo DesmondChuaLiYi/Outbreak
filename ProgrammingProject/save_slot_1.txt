@@ -2,7 +2,7 @@ Tony Redgrave
 
 1
 8
-101
+125
 125
 loc_ruined_city
 1
@@ -12,10 +12,12 @@ loc_ruined_city
 Knife
 0
 2
-7
+8
 |Bandage|1|Restores 15 HP|2|3|1|1|15|0|0|0
 |Canned Food|2|Restores 30 hunger|2|4|1|1|0|30|0|0
-0
+|Wire|3|Useful for repairs|2|1|0|0|0|0|0|0
+1
+mat_wire_city
 1
 2
 0

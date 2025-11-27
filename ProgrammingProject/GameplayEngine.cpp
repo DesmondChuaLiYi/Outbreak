@@ -672,6 +672,9 @@ void GameplayEngine::startCombat() {
 	inCombat = true;
 	currentWaveNumber = 0;
 
+	// Start combat music (pauses location music)
+	AudioEngine::getInstance()->playCombatMusic();
+
 	system(CLEAR_SCREEN);
 	std::cout << "\n" << std::string(80, '=') << "\n";
 	std::cout << "  COMBAT INITIATED!\n";
@@ -683,6 +686,9 @@ void GameplayEngine::startCombat() {
 	if (result.playerWon) {
 		std::cout << "  [REWARD] Victory! You gained experience.\n";
 	}
+
+	// Stop combat music and resume location music
+	AudioEngine::getInstance()->stopCombatMusic();
 }
 
 void GameplayEngine::spawnZombieWave() {

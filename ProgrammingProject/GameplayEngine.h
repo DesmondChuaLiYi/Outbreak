@@ -185,7 +185,7 @@ public:
 	void setPickedUpLootIDs(const std::vector<std::string>& ids) { pickedUpLootIDs = ids; }
 
 	// Getters for save/load
-	int getPickedUpLootCount() const { return pickedUpLootIDs.size(); }
+	size_t getPickedUpLootCount() const { return pickedUpLootIDs.size(); }
 	const std::vector<std::string>& getPickedUpLootIDs() const { return pickedUpLootIDs; }
 	bool isLootPickedUp(const std::string& lootID) const {
 		for (const auto& id : pickedUpLootIDs) {

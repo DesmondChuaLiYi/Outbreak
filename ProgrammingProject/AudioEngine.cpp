@@ -77,9 +77,7 @@ AudioEngine::AudioEngine()
 	}
 
 	std::cout << "[AUDIO] DirectSound initialized successfully\n";
-
-	// Auto-play background music
-	playBackgroundMusic();
+	// Note: Music will be started by main.cpp when showing title screen
 }
 
 // Destructor

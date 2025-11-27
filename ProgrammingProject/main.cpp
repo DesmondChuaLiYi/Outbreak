@@ -18,6 +18,10 @@ int main() {
 	// Main game loop - returns to title screen after each session
 	bool gameRunning = true;
 	while (gameRunning) {
+		// Stop all music and play title screen music
+		audio->stopAllMusic();
+		audio->playBackgroundMusic("Audio\\Music\\background_music.wav");
+
 		// Display title screen
 		TitleScreen titleScreen("OUTBREAK");
 		int choice = titleScreen.run();
@@ -25,10 +29,12 @@ int main() {
 		switch (choice) {
 		case 0: // New Game
 			engine->handleNewGame();
+			// After game ends, loop will return to title screen with title music
 			break;
 
 		case 1: // Load Game
 			engine->handleLoadGame();
+			// After game ends, loop will return to title screen with title music
 			break;
 
 		case 2: // Exit
