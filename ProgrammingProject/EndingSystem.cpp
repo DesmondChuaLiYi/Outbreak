@@ -58,10 +58,12 @@ void EndingSystem::displayEnding(EndingType type, Player* player, ClueJournal* j
 	AudioEngine* audio = AudioEngine::getInstance();
 	if (audio != nullptr) {
 		audio->stopAllMusic();
-		audio->playBackgroundMusic("Audio\\Music\\title_screen.wav");
+		audio->playBackgroundMusic("Audio\\Music\\background_music.wav");
 	}
 
+	// CRITICAL FIX: Clear screen and show title screen
 	system("cls");
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 // ============================================================================

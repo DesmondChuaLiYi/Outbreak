@@ -1084,7 +1084,7 @@ Player* GameEngine::loadGame(int slotNumber) {
 			size_t pipePos = line.find('|');
 			if (pipePos != std::string::npos) {
 				std::string skillID = line.substr(0, pipePos);
-				int level = std::stoi(line.substr(pipePos + 1));
+			 int level = std::stoi(line.substr(pipePos + 1));
 				skillIDs.push_back(skillID);
 				skillLevels.push_back(level);
 			}
@@ -1222,8 +1222,8 @@ void GameEngine::handleNewGame() {
 	player->applySkillBonuses();
 
 	runExplorationLoop(player);
-
-	delete player;
+	
+	// Game session has ended, main loop will display title screen again
 }
 
 void GameEngine::handleLoadGame() {
