@@ -7,6 +7,7 @@
 #include "Spitter.h"
 #include "Smoker.h"
 #include "Tank.h"
+#include "EndingSystem.h"
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
@@ -210,11 +211,11 @@ void GameplayEngine::displayCurrentLocation() {
 
 void GameplayEngine::displayLocationLayout() {
 	std::cout << "  AREA MAP:\n";
-	std::cout << "       [UP]\n";
-	std::cout << "        |\n";
+	std::cout << "        [UP]\n";
+	std::cout << "         |\n";
 	std::cout << "  [LEFT]-+-[RIGHT]\n";
-	std::cout << "        |\n";
-	std::cout << "      [DOWN]\n\n";
+	std::cout << "         |\n";
+	std::cout << "       [DOWN]\n\n";
 
 	std::cout << "  LOOT:\n";
 	bool hasLoot = false;

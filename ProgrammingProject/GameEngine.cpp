@@ -881,14 +881,17 @@ bool GameEngine::saveGame(Player* player, int slotNumber) {
 		Location* activeLocation = gameplay->getCurrentLocation();
 		if (activeLocation != nullptr) {
 			file << activeLocation->getID() << "\n";
+			file << activeLocation->getName() << "\n";  // NEW: Save location name
 			file << (activeLocation->isVisited() ? 1 : 0) << "\n";
 		}
 		else if (currentLocation != nullptr) {
 			file << currentLocation->getID() << "\n";
+			file << currentLocation->getName() << "\n";  // NEW: Save location name
 			file << (currentLocation->isVisited() ? 1 : 0) << "\n";
 		}
 		else {
 			file << "loc_ruined_city\n";
+			file << "Ruined City\n";  // NEW: Default location name
 			file << "0\n";
 		}
 
@@ -973,7 +976,7 @@ Player* GameEngine::loadGame(int slotNumber) {
 	}
 
 	try {
-		std::string playerName, playerID, locationID, equippedWeapon;
+		std::string playerName, playerID, locationID, locationName, equippedWeapon;
 		int level, damage, health, maxHealth, chapter, inventorySize, locationVisited;
 		int explorationProgress, movementSteps, xp, skillPoints;
 
@@ -982,6 +985,7 @@ Player* GameEngine::loadGame(int slotNumber) {
 		file >> level >> damage >> health >> maxHealth;
 		file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		std::getline(file, locationID);
+		std::getline(file, locationName);// NEW: Load location name
 		file >> locationVisited;
 		file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		file >> chapter;
@@ -1007,7 +1011,7 @@ Player* GameEngine::loadGame(int slotNumber) {
 			std::string line;
 			std::getline(file, line);
 
-			// Parse item data (pipe-delited)
+			// Parse item data (pipe-delimited)
 			size_t pos = 0;
 			std::vector<std::string> tokens;
 			while ((pos = line.find('|')) != std::string::npos) {

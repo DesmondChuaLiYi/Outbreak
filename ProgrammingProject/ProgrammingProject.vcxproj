@@ -129,6 +129,7 @@
     <ClCompile Include="ClueJournal.cpp" />
     <ClCompile Include="CommonInfected.cpp" />
     <ClCompile Include="Crafting.cpp" />
+    <ClCompile Include="EndingSystem.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameplayEngine.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="DoublyLinkedNode.h" />
     <ClInclude Include="DoublyLinkedNodeIterator.h" />
     <ClInclude Include="DoublyLinkedList.h" />
+    <ClInclude Include="EndingSystem.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameplayEngine.h" />
