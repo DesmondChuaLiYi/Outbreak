@@ -741,7 +741,15 @@ void GameplayEngine::startCombat() {
 	currentWaveNumber = 0;
 
 	// Start combat music (pauses location music)
-	AudioEngine::getInstance()->playCombatMusic();
+	bool isSanctuaryBoss = (currentLocation != nullptr && currentLocation->getID() == "loc_sanctuary");
+
+	if (currentLocation && !isSanctuaryBoss) {  // Only play combat music if NOT sanctuary boss
+		// Start combat
+		AudioEngine* audio = AudioEngine::getInstance();
+		if (audio != nullptr) {
+			audio->playCombatMusic();
+		}
+	}
 
 	system(CLEAR_SCREEN);
 	std::cout << "\n" << std::string(80, '=') << "\n";
@@ -767,34 +775,47 @@ void GameplayEngine::spawnZombieWave() {
 		delete currentWave.dequeue();
 	}
 
-	int zombieCount = 3 + (rand() % 4); // 3-6 zombies per wave
+	// SANCTUARY BOSS FIGHT: Only spawn one Tank
+	bool isSanctuaryBoss = (currentLocation != nullptr && currentLocation->getID() == "loc_sanctuary");
 	
-	// AI STORYTELLER INFLUENCE #1: Adjust zombie count based on player state
-	AIStoryteller* ai = AIStoryteller::getInstance();
-	zombieCount = ai->adjustZombieCount(zombieCount);
+	if (isSanctuaryBoss) {
+		// Spawn only the Tank boss for sanctuary
+		Zombie* tankBoss = new Tank("boss_tank", "The Protector");
+		currentWave.enqueue(tankBoss);
+		std::cout << "  1 boss appears!\n\n";
+	}
+	else {
+		// Normal wave spawning for other locations
+		int zombieCount = 3 + (rand() % 4); // 3-6 zombies per wave
+		
+		// AI STORYTELLER INFLUENCE #1: Adjust zombie count based on player state
+		AIStoryteller* ai = AIStoryteller::getInstance();
+		zombieCount = ai->adjustZombieCount(zombieCount);
 
-	for (int i = 0; i < zombieCount; ++i) {
-		Zombie* zombie = nullptr;
-		int type = rand() % 100;
+		for (int i = 0; i < zombieCount; ++i) {
+			Zombie* zombie = nullptr;
+			int type = rand() % 100;
 
-		// Increased special zombie spawning
-		if (type < 40) {  // 40% Boomer
-			zombie = new Boomer("boomer_" + std::to_string(i), "Boomer");
-		}
-		else if (type < 65) {  // 25% Spitter
-			zombie = new Spitter("spitter_" + std::to_string(i), "Spitter");
-		}
-		else if (type < 85) {  // 20% Smoker
-			zombie = new Smoker("smoker_" + std::to_string(i), "Smoker");
-		}
-		else {  // 15% Tank
-			zombie = new Tank("tank_" + std::to_string(i), "Tank");
+			// Increased special zombie spawning
+			if (type < 40) {  // 40% Boomer
+				zombie = new Boomer("boomer_" + std::to_string(i), "Boomer");
+			}
+			else if (type < 65) {  // 25% Spitter
+				zombie = new Spitter("spitter_" + std::to_string(i), "Spitter");
+			}
+			else if (type < 85) {  // 20% Smoker
+				zombie = new Smoker("smoker_" + std::to_string(i), "Smoker");
+			}
+			else {  // 15% Tank
+				zombie = new Tank("tank_" + std::to_string(i), "Tank");
+			}
+
+			currentWave.enqueue(zombie);
 		}
 
-		currentWave.enqueue(zombie);
+		std::cout << "" << zombieCount << " zombies appear!\n\n";
 	}
 
-	std::cout << "" << zombieCount << " zombies appear!\n\n";
 	std::this_thread::sleep_for(std::chrono::milliseconds(800));
 }
 
@@ -859,9 +880,9 @@ CombatResult GameplayEngine::conductCombat() {
 			
 			// Boss fight special display
 			if (isBossFight) {
-				std::cout << "  ???????????????????????????????????????????????????????????????\n";
+				std::cout << "  ===============================================================\n";
 				std::cout << "  BOSS: " << currentZombie->getType() << " - THE PROTECTOR\n";
-				std::cout << "  ???????????????????????????????????????????????????????????????\n";
+				std::cout << "  ===============================================================\n";
 			}
 			else {
 				std::cout << "  Enemy: " << currentZombie->getType() << "\n";
@@ -1544,7 +1565,7 @@ bool GameplayEngine::travelToLocation(const std::string& locationID) {
 		std::cout << "  FINAL ENCOUNTER\n";
 		std::cout << std::string(80, '=') << "\n\n";
 		std::cout << "  As you approach The Sanctuary's entrance, a massive figure\n";
-		std::cout << "  blocks your path. The Tank — the final guardian of the cure.\n\n";
+		std::cout << "  blocks your path. The Tank - the final guardian of the cure.\n\n";
 		std::cout << "  This is it. The end of your journey.\n\n";
 		std::cout << "  Press ENTER to begin the final battle...";
 		std::cin.get();

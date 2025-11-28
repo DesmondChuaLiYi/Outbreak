@@ -184,16 +184,6 @@
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="Zombie.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="FIXES_SUMMARY.md" />
-    <None Include="IMPLEMENTATION_GUIDE.md" />
-    <None Include="SAVE_LOAD_ENDING_FIXES_REPORT.md" />
-    <None Include="TESTING_GUIDE.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ERROR_FIXES_REPORT.txt" />
-    <Text Include="FIXES_QUICK_REFERENCE.txt" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

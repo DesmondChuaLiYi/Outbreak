@@ -79,7 +79,7 @@ void EndingSystem::displayBadEnding() {
 
 	// Animated story text
 	std::string story = 
-		"  Tony Redgrave never saw the final blow coming — the world rarely gives\n"
+		"  Tony Redgrave never saw the final blow coming - the world rarely gives\n"
 		"  warnings before it takes what little you have left. As he fell into the\n"
 		"  dirt, feeling the warmth of his blood mixing with the cold mud beneath\n"
 		"  him, he realized how terrifyingly thin the line between living and dying\n"
@@ -91,10 +91,10 @@ void EndingSystem::displayBadEnding() {
 		"  apocalypse had been screaming all along: in a world this broken, you\n"
 		"  don't get to hesitate. Every step, every choice, every scrap of vigilance\n"
 		"  is the difference between survival and extinction.\n\n"
-		"  The world did not end because monsters rose —\n"
+		"  The world did not end because monsters rose -\n"
 		"  it ended because people underestimated how fast the darkness spreads\n"
 		"  when no one stands against it.\n\n"
-		"  His story was not one of failure, but of an unfinished fight — a reminder\n"
+		"  His story was not one of failure, but of an unfinished fight - a reminder\n"
 		"  carved into the ruins for anyone still breathing:\n\n"
 		"  In the end, you don't lose when the world ends.\n"
 		"  You lose the moment you stop fighting to rebuild it.";
@@ -149,7 +149,7 @@ void EndingSystem::displayTrueEnding() {
 		"  The water purification system hums to life. Clean water flows.\n"
 		"  The cure spreads. The infected begin to fall. Humanity breathes again.\n\n"
 		"  But you've done more than save lives. You've preserved the truth.\n"
-		"  Every journal, every note, every piece of evidence — you have it all.\n\n"
+		"  Every journal, every note, every piece of evidence - you have it all.\n\n"
 		"  The corporations that caused this will face justice.\n"
 		"  The government officials who covered it up will be exposed.\n"
 		"  The world will know what happened, and why.\n\n"
