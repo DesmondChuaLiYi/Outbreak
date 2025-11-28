@@ -8,10 +8,9 @@
 class EndingSystem {
 public:
 	enum EndingType {
-		BAD_ENDING = 0,           // Player died
-		NORMAL_ENDING = 1,      // Boss defeated but not all clues collected
-		PERFECTIONIST_ENDING = 2, // All clues collected but boss not defeated
-		TRUE_ENDING = 3  // Boss defeated AND all clues collected
+		BAD_ENDING = 0,      // Player died
+		NORMAL_ENDING = 1,   // Boss defeated but not all clues collected
+		TRUE_ENDING = 2      // Boss defeated AND all clues collected
 	};
 
 	// Determine which ending should be triggered
@@ -24,13 +23,13 @@ private:
 	// Individual ending implementations
 	static void displayBadEnding();
 	static void displayNormalEnding();
-	static void displayPerfectionistEnding();
 	static void displayTrueEnding();
 
 	// Animation helper functions
 	static void printAnimatedText(const std::string& text);
-	static void printAnimatedTitle(const std::string& title, const std::string& subtitle);
+	static void printAnimatedTitle(const std::string& title);
 	static void playEndingMusic();
+	static void printEndingCredits(int endingNumber, const std::string& endingTitle);
 };
 
 #endif /* ENDINGSYSTEM_H */

@@ -4,19 +4,26 @@ Tony Redgrave
 13
 125
 125
-loc_canal
-Polluted Canal
+loc_ruined_city
+Ruined City
 1
-6
-0
-0
+1
+10
+10
 Knife
 0
-1
-7
+0
+13
 |Bandage|1|Restores 15 HP|2|3|1|1|15|0|0|0
 |Canned Food|2|Restores 30 hunger|2|4|1|1|0|30|0|0
-0
-0
+|Wire|3|Useful for repairs|2|1|0|0|0|0|0|0
+|Bandage|1|Restores 15 HP|2|3|1|1|15|0|0|0
+|Cloth|3|Torn fabric for crafting|3|2|0|0|0|0|0|0
+3
+mat_wire_city
+loot_001
+mat_cloth_city
 1
-combat_melee_1|1
+1
+1
+combat_melee_1|2

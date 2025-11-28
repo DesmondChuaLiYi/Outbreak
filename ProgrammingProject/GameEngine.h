@@ -6,6 +6,7 @@
 #include "Location.h"
 #include "Player.h"
 #include "ClueJournal.h"
+#include "AudioEngine.h"
 
 class GameEngine {
 private:

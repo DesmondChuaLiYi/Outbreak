@@ -172,6 +172,12 @@ bool GameEngine::travelToLocation(const std::string& locationID) {
 	// Display chapter intro if first visit
 	displayChapterIntro();
 
+	// CRITICAL FIX: Play location-specific music after traveling
+	AudioEngine* audio = AudioEngine::getInstance();
+	if (audio != nullptr && !audio->isInCombatMusic()) {
+		audio->playLocationMusic(locationID);
+	}
+
 	return true;
 }
 
@@ -1294,8 +1300,14 @@ void GameEngine::handleLoadGame() {
 					<< currentLocation->getChapterTitle() << "\n";
 				std::cout << std::string(80, '=') << "\n\n";
 				std::cout << "  " << currentLocation->getDescription() << "\n\n";
-				std::cout << "  Press ENTER to continue...";
+				std::cout << "  Press ENTER to continue..." << std::flush;
 				std::cin.get();
+
+				// CRITICAL FIX: Play location-specific music after loading
+				AudioEngine* audio = AudioEngine::getInstance();
+				if (audio != nullptr) {
+					audio->playLocationMusic(currentLocation->getID());
+				}
 			}
 
 			// Run the exploration loop
@@ -1621,7 +1633,7 @@ void GameEngine::runExplorationLoop(Player* player) {
 					}
 					else if (locationName.find("hospital") != std::string::npos) {
 						locationID = "loc_hospital";
-					}
+												}
 					else if (locationName.find("sanctuary") != std::string::npos) {
 						locationID = "loc_sanctuary";
 					}

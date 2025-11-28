@@ -800,14 +800,13 @@ void GameplayEngine::spawnZombieWave() {
 
 CombatResult GameplayEngine::conductCombat() {
 	CombatResult result;
+	bool isBossFight = currentLocation && currentLocation->getID() == "loc_sanctuary";
+	
 	Zombie* currentZombie = nullptr;
 
 	while (!currentWave.isEmpty() || currentZombie != nullptr) {
 		system(CLEAR_SCREEN);
 		std::cout << "\n  COMBAT\n\n";
-
-
-
 
 		if (currentZombie == nullptr || currentZombie->getHealth() <= 0) {
 			if (currentZombie != nullptr) {
@@ -820,8 +819,14 @@ CombatResult GameplayEngine::conductCombat() {
 				
 				// Award XP
 				int xpGain = 10;
-				currentPlayer->gainExperience(xpGain);
-				std::cout << "  [+XP] Gained " << xpGain << " experience!\n\n";
+				if (isBossFight) {
+					xpGain = 100; // Boss grants more XP
+					std::cout << "  [+XP BOSS] Gained " << xpGain << " experience!\n";
+				}
+				else {
+					currentPlayer->gainExperience(xpGain);
+					std::cout << "  [+XP] Gained " << xpGain << " experience!\n\n";
+				}
 				
 				AudioEngine::getInstance()->playZombieDeathSound();
 				result.zombiesKilled++;
@@ -852,7 +857,16 @@ CombatResult GameplayEngine::conductCombat() {
 			int barWidth = 20;
 			int filled = (int)(zombieHPPercent * barWidth);
 			
-			std::cout << "  Enemy: " << currentZombie->getType() << "\n";
+			// Boss fight special display
+			if (isBossFight) {
+				std::cout << "  ???????????????????????????????????????????????????????????????\n";
+				std::cout << "  BOSS: " << currentZombie->getType() << " - THE PROTECTOR\n";
+				std::cout << "  ???????????????????????????????????????????????????????????????\n";
+			}
+			else {
+				std::cout << "  Enemy: " << currentZombie->getType() << "\n";
+			}
+			
 			std::cout << "  [";
 			for (int i = 0; i < barWidth; i++) {
 				if (i < filled) std::cout << "=";
@@ -905,7 +919,14 @@ CombatResult GameplayEngine::conductCombat() {
 		}
 		std::cout << "\n";
 
-		std::cout << "  [1] Attack  [2] Dodge  [3] Item  [4] Flee\n";
+		// Boss fight special menu
+		if (isBossFight) {
+			std::cout << "  [1] Attack  [2] Dodge  [3] Item  [4] Special Attack (uses items)\n";
+		}
+		else {
+			std::cout << "  [1] Attack  [2] Dodge  [3] Item  [4] Flee\n";
+		}
+		
 		std::cout << "  Choice: ";
 
 		int action;
@@ -992,30 +1013,70 @@ CombatResult GameplayEngine::conductCombat() {
 			break;
 		}
 
-		case 4: { // Flee
-			if (rand() % 100 < 50) {
-				std::cout << "\n  [ESCAPED]\n";
-				combatActionHistory.push("Fled from combat");
-				result.playerWon = false;
-				while (!currentWave.isEmpty()) delete currentWave.dequeue();
-				if (currentZombie) delete currentZombie;
-				std::cout << "\n  Press ENTER...";
-				std::cin.get();
-				inCombat = false;
-				return result;
+		case 4: { // Flee or Special Attack (boss fight)
+			if (isBossFight) {
+				// Boss fight: Special attack instead of flee
+				std::cout << "\n  [SPECIAL ATTACK] You use all your might!\n";
+				
+				// Get AI storyteller bonus
+				AIStoryteller* ai = AIStoryteller::getInstance();
+				int specialDamage = currentPlayer->getDamage() * 2;
+				
+				// AI Storyteller grants random crit during boss fight
+				if (ai && rand() % 100 < 40) { // 40% chance for crit
+					specialDamage = (int)(specialDamage * 2.5f); // 2.5x damage on crit
+					std::cout << "  [AI BOOST] Critical strike! " << specialDamage << " damage!\n";
+					combatActionHistory.push("CRITICAL STRIKE: " + std::to_string(specialDamage) + " dmg!");
+				}
+				else {
+					std::cout << "You deal " << specialDamage << " damage!\n";
+					combatActionHistory.push("Special attack: " + std::to_string(specialDamage) + " dmg");
+				}
+				
+				currentZombie->takeDamage(specialDamage);
+				result.playerDamageDealt += specialDamage;
 			}
 			else {
-				std::cout << "\n  [FAILED] Couldn't escape!\n";
-				combatActionHistory.push("Failed to flee");
-				// Zombie punishes failed escape
-				int zombieAttackDmg = currentZombie->getDamage();
-				std::cout << "  Zombie attacks while you flee for " << zombieAttackDmg << " damage!\n";
-				currentPlayer->takeDamage(zombieAttackDmg);
-				result.playerDamageTaken += zombieAttackDmg;
-				combatActionHistory.push("Took " + std::to_string(zombieAttackDmg) + " dmg (flee failed)");
+				// Regular fight: Try to flee
+				if (rand() % 100 < 50) {
+					std::cout << "\n  [ESCAPED]\n";
+					combatActionHistory.push("Fled from combat");
+					result.playerWon = false;
+					while (!currentWave.isEmpty()) delete currentWave.dequeue();
+					if (currentZombie) delete currentZombie;
+					std::cout << "\n  Press ENTER...";
+					std::cin.get();
+					inCombat = false;
+					return result;
+				}
+				else {
+					std::cout << "\n  [FAILED] Couldn't escape!\n";
+					combatActionHistory.push("Failed to flee");
+					// Zombie punishes failed escape
+					int zombieAttackDmg = currentZombie->getDamage();
+					std::cout << "  Zombie attacks while you flee for " << zombieAttackDmg << " damage!\n";
+					currentPlayer->takeDamage(zombieAttackDmg);
+					result.playerDamageTaken += zombieAttackDmg;
+					combatActionHistory.push("Took " + std::to_string(zombieAttackDmg) + " dmg (flee failed)");
+				}
 			}
 			break;
 		}
+		}
+
+		// AI STORYTELLER: Boss fight assistance (heal when very low)
+		if (isBossFight && currentPlayer->getHealth() <= currentPlayer->getMaxHealth() / 4) {
+			AIStoryteller* ai = AIStoryteller::getInstance();
+			if (ai && rand() % 100 < 60) { // 60% chance to heal when critical
+				int healAmount = currentPlayer->getMaxHealth() / 2;
+				int newHP = currentPlayer->getHealth() + healAmount;
+				if (newHP > currentPlayer->getMaxHealth()) {
+					newHP = currentPlayer->getMaxHealth();
+				}
+				currentPlayer->setHealth(newHP);
+				std::cout << "\n  [AI INTERVENTION] The storyteller restores " << healAmount << " HP!\n";
+				combatActionHistory.push("AI HEALED: +" + std::to_string(healAmount) + " HP");
+			}
 		}
 
 		if (currentPlayer->getHealth() <= 0) {
@@ -1474,6 +1535,51 @@ bool GameplayEngine::travelToLocation(const std::string& locationID) {
 		newLocation->markVisited();
 		std::cout << "\n\n  Press ENTER to continue...";
 		std::cin.get();
+	}
+
+	// SANCTUARY SPECIAL HANDLING: Trigger instant boss fight
+	if (locationID == "loc_sanctuary" && !newLocation->isCleared()) {
+		system(CLEAR_SCREEN);
+		std::cout << "\n" << std::string(80, '=') << "\n";
+		std::cout << "  FINAL ENCOUNTER\n";
+		std::cout << std::string(80, '=') << "\n\n";
+		std::cout << "  As you approach The Sanctuary's entrance, a massive figure\n";
+		std::cout << "  blocks your path. The Tank — the final guardian of the cure.\n\n";
+		std::cout << "  This is it. The end of your journey.\n\n";
+		std::cout << "  Press ENTER to begin the final battle...";
+		std::cin.get();
+
+		// Add the Tank boss to the location
+		Tank* tankBoss = new Tank("boss_tank", "The Protector");
+		newLocation->addZombie(tankBoss);
+
+		// Play sanctuary music and then combat music
+		AudioEngine* audio = AudioEngine::getInstance();
+		audio->playLocationMusic("loc_sanctuary");
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+		// Start combat
+		startCombat();
+
+		// Check if player won or lost
+		if (currentPlayer->getHealth() > 0) {
+			// VICTORY: Determine ending type
+			ClueJournal* journal = engine->getJournal();
+			EndingSystem::EndingType endingType = EndingSystem::determineEnding(false, true, currentPlayer, journal);
+			
+			// Display the ending
+			EndingSystem::displayEnding(endingType, currentPlayer, journal);
+		}
+		else {
+			// DEFEAT: Bad ending
+			EndingSystem::displayEnding(EndingSystem::BAD_ENDING, currentPlayer, engine->getJournal());
+		}
+
+		// Mark location as cleared
+		newLocation->setCleared(true);
+
+		// Return false to signal game should end
+		return false;
 	}
 
 	return true;
