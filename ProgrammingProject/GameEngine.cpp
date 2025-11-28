@@ -1550,7 +1550,7 @@ void GameEngine::runExplorationLoop(Player* player) {
 				std::cout << "  Available Commands:\n\n";
 				std::cout << "  spawn <zombie_type>  - Spawn a zombie (boomer, spitter, smoker, tank, common)\n";
 				std::cout << "  tp <location>        - Teleport to location (e.g., 'tp industrial district')\n";
-				std::cout << "  ending <type>     - Trigger ending (good, bad, normal, perfectionist)\n";
+				std::cout << "  ending <type>     - Trigger ending (good, bad, true)\n";
 				std::cout << "  heal      - Restore full health\n";
 				std::cout << "  addxp <amount> - Add experience points\n";
 				std::cout << "  addsp <amount>       - Add skill points\n";
