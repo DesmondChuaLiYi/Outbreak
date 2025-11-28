@@ -338,7 +338,10 @@ std::vector<int> ClueJournal::getCollectedClueIDs() const {
 
 // Restore collected clues from saved IDs
 void ClueJournal::setCollectedClueIDs(const std::vector<int>& clueIDs) {
-	// CRITICAL FIX: Mark clues as collected in both lists and increment counter
+	// CRITICAL FIX: Clear first to avoid duplicates, then mark clues as collected in both lists
+	fCollectedClues = DoublyLinkedList<Clue>();  // Clear collected list
+	fCluesCollected = 0;
+
 	for (int clueID : clueIDs) {
 		// Find in all clues and mark as collected
 		DoublyLinkedList<Clue>::Iterator it = fAllClues.begin();

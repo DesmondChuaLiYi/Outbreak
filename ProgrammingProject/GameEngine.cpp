@@ -7,6 +7,7 @@
 #include "Spitter.h"
 #include "Smoker.h"
 #include "Tank.h"
+#include "EndingSystem.h"
 #include <iostream>
 #include <limits>
 #include <fstream>
@@ -1633,7 +1634,7 @@ void GameEngine::runExplorationLoop(Player* player) {
 					}
 					else if (locationName.find("hospital") != std::string::npos) {
 						locationID = "loc_hospital";
-												}
+														}
 					else if (locationName.find("sanctuary") != std::string::npos) {
 						locationID = "loc_sanctuary";
 					}
@@ -1661,10 +1662,40 @@ void GameEngine::runExplorationLoop(Player* player) {
 				else if (cheatCmd.find("ending ") == 0) {
 					std::string endingType = cheatCmd.substr(7);
 					
-					std::cout << "\n  [ENDING] Triggering " << endingType << " ending...\n";
-					std::cout << "  [PLACEHOLDER] This ending has not been implemented yet.\n";
-					std::cout << "  Press ENTER...";
-					std::cin.get();
+					if (endingType == "bad" || endingType == "game over") {
+						std::cout << "\n  [ENDING] Triggering bad ending...\n";
+						EndingSystem::displayEnding(EndingSystem::BAD_ENDING, player, journal);
+						inCheatMenu = false;
+						exploring = false;
+					}
+					else if (endingType == "good" || endingType == "normal") {
+						std::cout << "\n  [ENDING] Triggering normal ending...\n";
+						EndingSystem::displayEnding(EndingSystem::NORMAL_ENDING, player, journal);
+						inCheatMenu = false;
+						exploring = false;
+					}
+					else if (endingType == "true" || endingType == "perfect" || endingType == "perfectionist") {
+						std::cout << "\n  [ENDING] Triggering true ending...\n";
+						// First, collect all remaining clues to achieve true ending
+						if (journal->getTotalCollected() < 46) {
+							// Simulate collecting all clues
+							for (int i = 1; i <= 46; i++) {
+								if (!journal->isClueCollected(i)) {
+									journal->collectClue(i);
+								}
+							}
+							std::cout << "  [DEBUG] All clues collected for true ending!\n";
+						}
+						EndingSystem::displayEnding(EndingSystem::TRUE_ENDING, player, journal);
+						inCheatMenu = false;
+						exploring = false;
+					}
+					else {
+						std::cout << "\n  [ERROR] Unknown ending type: " << endingType << "\n";
+						std::cout << "  Available: bad, good, normal, true, perfect, perfectionist\n";
+						std::cout << "  Press ENTER...";
+						std::cin.get();
+					}
 				}
 				else if (cheatCmd == "heal") {
 					player->setHealth(player->getMaxHealth());

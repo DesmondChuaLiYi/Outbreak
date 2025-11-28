@@ -1,5 +1,6 @@
-#include "EndingSystem.h"
+ï»¿#include "EndingSystem.h"
 #include "AudioEngine.h"
+#include "TitleScreen.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -16,10 +17,10 @@ EndingSystem::EndingType EndingSystem::determineEnding(bool playerDefeated, bool
 		return BAD_ENDING;
 	}
 
-	// Check if player has all clues
-	bool hasAllClues = journal->hasAllClues();
+	// Check total clues (46 total in game)
+	bool hasAllClues = (journal->getTotalCollected() == 46);
 
-	// True ending: Boss defeated + all clues collected
+	// True ending: Boss defeated + all 46 clues collected
 	if (bossDefeated && hasAllClues) {
 		return TRUE_ENDING;
 	}
@@ -49,10 +50,18 @@ void EndingSystem::displayEnding(EndingType type, Player* player, ClueJournal* j
 		break;
 	}
 
-	// Wait for user to press ENTER to return to title screen
+	// Wait for user to press ENTER
 	std::cout << "\n\n  Press ENTER to return to the title screen...";
-	std::cin.ignore();
 	std::cin.get();
+
+	// Stop ending music and return to title screen music
+	AudioEngine* audio = AudioEngine::getInstance();
+	if (audio != nullptr) {
+		audio->stopAllMusic();
+		audio->playBackgroundMusic("Audio\\Music\\title_screen.wav");
+	}
+
+	system("cls");
 }
 
 // ============================================================================
@@ -70,7 +79,7 @@ void EndingSystem::displayBadEnding() {
 
 	// Animated story text
 	std::string story = 
-		"  Tony Redgrave never saw the final blow coming — the world rarely gives\n"
+		"  Tony Redgrave never saw the final blow coming â€” the world rarely gives\n"
 		"  warnings before it takes what little you have left. As he fell into the\n"
 		"  dirt, feeling the warmth of his blood mixing with the cold mud beneath\n"
 		"  him, he realized how terrifyingly thin the line between living and dying\n"
@@ -82,10 +91,10 @@ void EndingSystem::displayBadEnding() {
 		"  apocalypse had been screaming all along: in a world this broken, you\n"
 		"  don't get to hesitate. Every step, every choice, every scrap of vigilance\n"
 		"  is the difference between survival and extinction.\n\n"
-		"  The world did not end because monsters rose —\n"
+		"  The world did not end because monsters rose â€”\n"
 		"  it ended because people underestimated how fast the darkness spreads\n"
 		"  when no one stands against it.\n\n"
-		"  His story was not one of failure, but of an unfinished fight — a reminder\n"
+		"  His story was not one of failure, but of an unfinished fight â€” a reminder\n"
 		"  carved into the ruins for anyone still breathing:\n\n"
 		"  In the end, you don't lose when the world ends.\n"
 		"  You lose the moment you stop fighting to rebuild it.";
@@ -138,9 +147,9 @@ void EndingSystem::displayTrueEnding() {
 		"  You stand victorious, every clue collected, every secret uncovered,\n"
 		"  every challenge overcome. You've done the impossible.\n\n"
 		"  The water purification system hums to life. Clean water flows.\n"
-		"The cure spreads. The infected begin to fall. Humanity breathes again.\n\n"
+		"  The cure spreads. The infected begin to fall. Humanity breathes again.\n\n"
 		"  But you've done more than save lives. You've preserved the truth.\n"
-		"  Every journal, every note, every piece of evidence — you have it all.\n\n"
+		"  Every journal, every note, every piece of evidence â€” you have it all.\n\n"
 		"  The corporations that caused this will face justice.\n"
 		"  The government officials who covered it up will be exposed.\n"
 		"  The world will know what happened, and why.\n\n"
@@ -168,7 +177,7 @@ void EndingSystem::printAnimatedText(const std::string& text) {
 
 void EndingSystem::printAnimatedTitle(const std::string& title) {
 	// Print separator
-	std::cout << "  ???????????????????????????????????????????????????????????????\n";
+	std::cout << "  ===============================================================\n";
 	
 	// Print title with animation
 	std::cout << "  ";
@@ -179,7 +188,7 @@ void EndingSystem::printAnimatedTitle(const std::string& title) {
 	std::cout << "\n";
 
 	// Print separator
-	std::cout << "  ???????????????????????????????????????????????????????????????\n";
+	std::cout << "  ===============================================================\n";
 }
 
 void EndingSystem::playEndingMusic() {
@@ -193,9 +202,9 @@ void EndingSystem::playEndingMusic() {
 void EndingSystem::printEndingCredits(int endingNumber, const std::string& endingTitle) {
 	// Print ending label centered
 	std::cout << "\n\n";
-	std::cout << "  ???????????????????????????????????????????????????????????????\n";
+	std::cout << "  ===============================================================\n";
 	std::cout << "  Ending (" << (endingNumber + 1) << "/3): " << endingTitle << "\n";
 	std::cout << "  \n";
 	std::cout << "  Thank you for playing OUTBREAK\n";
-	std::cout << "  ???????????????????????????????????????????????????????????????\n";
+	std::cout << "  ===============================================================\n";
 }
